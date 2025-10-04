@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import { OrderSummary } from './order-summary';
+import { CakeShapeId } from './shape-data';
+import ShapePreview from './shape-preview';
 import { StepIndicator } from './step-indicator';
 import { ConfirmationStep } from './steps/confirmation-step';
 import { ContactStep } from './steps/contact-step';
@@ -36,15 +38,42 @@ const STEPS = [
   { id: 6, title: 'Contact', component: ContactStep },
   { id: 7, title: 'Date', component: DateStep },
 ];
-
 export function CakeOrderFunnel() {
   const [currentStep, setCurrentStep] = useState(1);
   const [order, setOrder] = useState<CakeOrder>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [previewShape, setPreviewShape] = useState<CakeShapeId | undefined>(
+    order.shape as CakeShapeId | undefined
+  );
+  const [previewLayers, setPreviewLayers] = useState<number | undefined>(
+    order.layers
+  );
+
+  useEffect(() => {
+    setPreviewShape(order.shape as CakeShapeId | undefined);
+  }, [order.shape]);
+
+  useEffect(() => {
+    setPreviewLayers(order.layers);
+  }, [order.layers]);
+
+  useEffect(() => {
+    if (order.layers) {
+      setPreviewLayers(order.layers);
+    }
+  }, [order.layers]);
 
   const handleNext = (data: Partial<CakeOrder>) => {
     const updatedOrder = { ...order, ...data };
     setOrder(updatedOrder);
+
+    if (data.shape) {
+      setPreviewShape(data.shape as CakeShapeId);
+    }
+
+    if (data.layers) {
+      setPreviewLayers(data.layers);
+    }
 
     if (currentStep === STEPS.length) {
       // Submit the order
@@ -71,6 +100,8 @@ export function CakeOrderFunnel() {
   }
 
   const CurrentStepComponent = STEPS[currentStep - 1].component;
+  const isShapeStep = currentStep === 1;
+  const isLayersStep = currentStep === 2;
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,7 +134,7 @@ export function CakeOrderFunnel() {
             </p>
           </div> */}
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8 items-start">
             {/* Left Column - Step Navigation */}
             <div className="hidden lg:block col-span-2">
               <div className="sticky top-8">
@@ -112,18 +143,68 @@ export function CakeOrderFunnel() {
             </div>
 
             {/* Mobile Step Indicator - Horizontal */}
-            <div className="lg:hidden col-span-1">
+            <div className="lg:hidden col-span-full">
               <StepIndicator steps={STEPS} currentStep={currentStep} />
             </div>
 
             {/* Middle Column - Form Content */}
-            <div className="w-full col-span-7 px-10">
-              <CurrentStepComponent
-                order={order}
-                onNext={handleNext}
-                onBack={handleBack}
-                isFirstStep={currentStep === 1}
-              />
+            <div className="w-full col-span-full lg:col-span-7 px-0 lg:px-10">
+              <div className="flex flex-col gap-8">
+                <div className="hidden lg:flex items-center justify-center rounded-xl border border-border bg-card p-6 text-foreground/90">
+                  {previewShape ? (
+                    <ShapePreview
+                      shape={previewShape}
+                      layers={previewLayers ?? order.layers ?? 1}
+                      className="w-full max-w-[200px]"
+                    />
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      Select a shape to preview your cake
+                    </div>
+                  )}
+                </div>
+                <div>
+                  {isShapeStep ? (
+                    <ShapeStep
+                      order={order}
+                      onNext={handleNext}
+                      onBack={handleBack}
+                      isFirstStep={currentStep === 1}
+                      onShapeChange={(shape) => setPreviewShape(shape)}
+                    />
+                  ) : isLayersStep ? (
+                    <LayersStep
+                      order={order}
+                      onNext={handleNext}
+                      onBack={handleBack}
+                      isFirstStep={false}
+                      onLayersChange={(n: number) => setPreviewLayers(n)}
+                    />
+                  ) : (
+                    <CurrentStepComponent
+                      order={order}
+                      onNext={handleNext}
+                      onBack={handleBack}
+                      isFirstStep={currentStep === 1}
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="mt-6 lg:hidden">
+                <div className="flex items-center justify-center rounded-xl border border-border bg-card p-5 text-foreground/90">
+                  {previewShape ? (
+                    <ShapePreview
+                      shape={previewShape}
+                      layers={previewLayers ?? order.layers ?? 1}
+                      className="w-full max-w-[160px]"
+                    />
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      Select a shape to preview your cake
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Right Column - Order Summary (Sticky) */}

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { CakeOrder } from '../cake-order-funnel';
 
 interface LayersStepProps {
@@ -10,12 +10,19 @@ interface LayersStepProps {
   onNext: (data: Partial<CakeOrder>) => void;
   onBack: () => void;
   isFirstStep: boolean;
+  onLayersChange?: (layers: number) => void;
 }
 
 const LAYER_OPTIONS = [1, 2, 3, 4, 5];
 
-export function LayersStep({ order, onNext, onBack, isFirstStep }: LayersStepProps) {
+export function LayersStep({ order, onNext, onBack, isFirstStep, onLayersChange }: LayersStepProps) {
   const [selectedLayers, setSelectedLayers] = useState(order.layers || 0);
+
+  useEffect(() => {
+    if (selectedLayers > 0) {
+      onLayersChange?.(selectedLayers);
+    }
+  }, [selectedLayers, onLayersChange]);
 
   const handleNext = () => {
     if (selectedLayers > 0) {
@@ -40,6 +47,14 @@ export function LayersStep({ order, onNext, onBack, isFirstStep }: LayersStepPro
               selectedLayers === layers ? 'border-accent bg-accent/5' : 'border-border bg-card'
             }`}
             onClick={() => setSelectedLayers(layers)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedLayers(layers);
+              }
+            }}
           >
             <div className="flex flex-col items-center gap-2 text-center">
               <span className="font-[family-name:var(--font-playfair)] text-4xl font-bold text-foreground">

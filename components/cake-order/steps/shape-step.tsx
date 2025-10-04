@@ -2,7 +2,15 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useState } from 'react';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { useEffect, useState } from 'react';
+import { CAKE_SHAPE_OPTIONS, CakeShapeId } from '../shape-data';
 import { CakeOrder } from '../cake-order-funnel';
 
 interface ShapeStepProps {
@@ -10,18 +18,29 @@ interface ShapeStepProps {
   onNext: (data: Partial<CakeOrder>) => void;
   onBack: () => void;
   isFirstStep: boolean;
+  onShapeChange?: (shape: CakeShapeId | undefined) => void;
 }
 
-const SHAPES = [
-  { id: 'round', name: 'Round', icon: '⭕' },
-  { id: 'square', name: 'Square', icon: '⬜' },
-  { id: 'rectangle', name: 'Rectangle', icon: '▭' },
-  { id: 'heart', name: 'Heart', icon: '♥' },
-  { id: 'custom', name: 'Custom Shape', icon: '✨' },
-];
+export function ShapeStep({
+  order,
+  onNext,
+  onBack,
+  isFirstStep,
+  onShapeChange,
+}: ShapeStepProps) {
+  const [selectedShape, setSelectedShape] = useState<CakeShapeId | ''>(
+    (order.shape as CakeShapeId) || ''
+  );
 
-export function ShapeStep({ order, onNext, onBack, isFirstStep }: ShapeStepProps) {
-  const [selectedShape, setSelectedShape] = useState(order.shape || '');
+  useEffect(() => {
+    if (order.shape) {
+      setSelectedShape(order.shape as CakeShapeId);
+    }
+  }, [order.shape]);
+
+  useEffect(() => {
+    onShapeChange?.(selectedShape || undefined);
+  }, [onShapeChange, selectedShape]);
 
   const handleNext = () => {
     if (selectedShape) {
@@ -38,21 +57,55 @@ export function ShapeStep({ order, onNext, onBack, isFirstStep }: ShapeStepProps
         <p className="mt-2 text-muted-foreground">Select the shape that best fits your vision</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {SHAPES.map((shape) => (
-          <Card
-            key={shape.id}
-            className={`cursor-pointer border-2 p-6 transition-all hover:border-accent ${
-              selectedShape === shape.id ? 'border-accent bg-accent/5' : 'border-border bg-card'
-            }`}
-            onClick={() => setSelectedShape(shape.id)}
-          >
-            <div className="flex flex-col items-center gap-3 text-center">
-              <span className="text-4xl">{shape.icon}</span>
-              <span className="font-semibold text-foreground">{shape.name}</span>
-            </div>
-          </Card>
-        ))}
+      <div className="relative">
+        <Carousel
+          opts={{ align: 'start', dragFree: true, containScroll: 'trimSnaps' }}
+          className="w-full"
+        >
+          <CarouselContent className="py-2">
+            {CAKE_SHAPE_OPTIONS.map((shape) => {
+              const isSelected = selectedShape === shape.id;
+
+              return (
+                <CarouselItem
+                  key={shape.id}
+                  className="basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/5"
+                >
+                  <Card
+                    role="button"
+                    tabIndex={0}
+                    className={`h-full cursor-pointer border-2 p-5 text-center transition-all hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 ${
+                      isSelected ? 'border-accent bg-accent/10' : 'border-border bg-card'
+                    }`}
+                    onClick={() => setSelectedShape(shape.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        setSelectedShape(shape.id);
+                      }
+                    }}
+                  >
+                    <div className="flex h-full flex-col items-center justify-center gap-4">
+                      <div className="flex items-center justify-center" aria-hidden>
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-accent/10 text-foreground">
+                          <div
+                            className="h-14 w-14"
+                            dangerouslySetInnerHTML={{ __html: shape.svg }}
+                          />
+                        </div>
+                      </div>
+                      <span className="font-semibold text-foreground">
+                        {shape.name}
+                      </span>
+                    </div>
+                  </Card>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+          <CarouselPrevious className="hidden sm:flex" />
+          <CarouselNext className="hidden sm:flex" />
+        </Carousel>
       </div>
 
       <div className="flex justify-between pt-6">

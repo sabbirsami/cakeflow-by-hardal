@@ -2,6 +2,14 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { CakeOrder } from '../cake-order-funnel';
 
@@ -49,46 +57,55 @@ export function TasteStep({ order, onNext, onBack, isFirstStep }: TasteStepProps
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        {TASTES.map((taste) => (
-          <Card
-            key={taste.id}
-            className={`cursor-pointer border-2 p-6 transition-all hover:border-accent ${
-              selectedTastes.includes(taste.id)
-                ? 'border-accent bg-accent/5'
-                : 'border-border bg-card'
-            }`}
-            onClick={() => toggleTaste(taste.id)}
-          >
-            <div className="flex items-start gap-3">
-              <div
-                className={`mt-1 flex h-5 w-5 items-center justify-center rounded border-2 ${
-                  selectedTastes.includes(taste.id) ? 'border-accent bg-accent' : 'border-border'
-                }`}
-              >
-                {selectedTastes.includes(taste.id) && (
-                  <svg
-                    className="h-3 w-3 text-accent-foreground"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+      <div className="relative">
+        <Carousel
+          opts={{ align: 'start', dragFree: true, containScroll: 'trimSnaps' }}
+          className="w-full"
+        >
+          <CarouselContent className="py-2">
+            {TASTES.map((taste) => {
+              const isSelected = selectedTastes.includes(taste.id);
+
+              return (
+                <CarouselItem
+                  key={taste.id}
+                  className="basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/5"
+                >
+                  <Card
+                    role="button"
+                    tabIndex={0}
+                    className={`h-full cursor-pointer border-2 p-5 transition-all hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 ${
+                      isSelected ? 'border-accent bg-accent/10' : 'border-border bg-card'
+                    }`}
+                    onClick={() => toggleTaste(taste.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        toggleTaste(taste.id);
+                      }
+                    }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                )}
-              </div>
-              <div className="flex-1">
-                <h4 className="font-semibold text-foreground">{taste.name}</h4>
-                <p className="text-sm text-muted-foreground">{taste.description}</p>
-              </div>
-            </div>
-          </Card>
-        ))}
+                    <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                          isSelected ? 'border-accent bg-accent text-accent-foreground' : 'border-border text-muted-foreground'
+                        }`}
+                      >
+                        {isSelected && <Check className="h-5 w-5" strokeWidth={3} />}
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="font-semibold text-foreground">{taste.name}</h4>
+                        <p className="text-sm text-muted-foreground">{taste.description}</p>
+                      </div>
+                    </div>
+                  </Card>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+          <CarouselPrevious className="hidden sm:flex" />
+          <CarouselNext className="hidden sm:flex" />
+        </Carousel>
       </div>
 
       <div className="flex justify-between pt-6">
