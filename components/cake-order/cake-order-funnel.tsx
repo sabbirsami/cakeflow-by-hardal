@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Cake } from 'lucide-react';
 import Image from 'next/image';
@@ -16,6 +16,7 @@ import { LayersStep } from './steps/layers-step';
 import { ShapeStep } from './steps/shape-step';
 import { TasteStep } from './steps/taste-step';
 import { TextStep } from './steps/text-step';
+import { gsap } from 'gsap';
 
 export type CakeOrder = {
   shape?: string;
@@ -49,6 +50,9 @@ export function CakeOrderFunnel() {
   const [previewLayers, setPreviewLayers] = useState<number | undefined>(order.layers);
   const [previewTastes, setPreviewTastes] = useState<string[] | undefined>(order.tastes);
   const [previewMessage, setPreviewMessage] = useState<string | undefined>(order.text);
+  const stepContentRef = useRef<HTMLDivElement | null>(null);
+  const desktopPreviewRef = useRef<HTMLDivElement | null>(null);
+  const mobilePreviewRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setPreviewShape(order.shape as CakeShapeId | undefined);
@@ -71,6 +75,40 @@ export function CakeOrderFunnel() {
   useEffect(() => {
     setPreviewMessage(order.text);
   }, [order.text]);
+
+  useEffect(() => {
+    if (!stepContentRef.current) return;
+
+    gsap.fromTo(
+      stepContentRef.current,
+      { opacity: 0, y: 28 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+      },
+    );
+  }, [currentStep]);
+
+  useEffect(() => {
+    const targets = [desktopPreviewRef.current, mobilePreviewRef.current].filter(Boolean) as HTMLDivElement[];
+
+    if (!targets.length) {
+      return;
+    }
+
+    gsap.fromTo(
+      targets,
+      { opacity: 0.8, scale: 0.98 },
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.5,
+        ease: 'power1.out',
+      },
+    );
+  }, [previewShape, previewLayers, previewTastes, previewMessage]);
 
   const handleNext = (data: Partial<CakeOrder>) => {
     const updatedOrder = { ...order, ...data };
@@ -200,7 +238,10 @@ export function CakeOrderFunnel() {
             {/* Middle Column - Form Content */}
             <div className="w-full col-span-full lg:col-span-7 px-1 sm:px-3 lg:px-6">
               <div className="flex flex-col gap-8 lg:min-h-[540px]">
-                <div className="hidden lg:flex items-center justify-center border-b px-10 py-8 text-foreground/90">
+                <div
+                  ref={desktopPreviewRef}
+                  className="hidden lg:flex items-center justify-center border-b px-10 py-8 text-foreground/90"
+                >
                   {previewShape ? (
                     <ShapePreview
                       shape={previewShape}
@@ -216,9 +257,11 @@ export function CakeOrderFunnel() {
                     </div>
                   )}
                 </div>
-                <div className="mt-8 lg:mt-auto">{stepContent}</div>
+                <div ref={stepContentRef} className="mt-8 lg:mt-auto">
+                  {stepContent}
+                </div>
               </div>
-              <div className="mt-8 lg:hidden">
+              <div className="mt-8 lg:hidden" ref={mobilePreviewRef}>
                 <div className="flex items-center justify-center rounded-3xl border border-border/60 bg-card/60 p-6 text-foreground/90">
                   {previewShape ? (
                     <ShapePreview

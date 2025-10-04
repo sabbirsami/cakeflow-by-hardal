@@ -1,9 +1,20 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { addDays, format, parseISO, startOfToday } from 'date-fns';
+import { CalendarIcon, Clock } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { CakeOrder } from '../cake-order-funnel';
 
 interface DateStepProps {
@@ -13,81 +24,128 @@ interface DateStepProps {
   isFirstStep: boolean;
 }
 
-export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) {
-  const [date, setDate] = useState(order.date || '');
-  const [time, setTime] = useState(order.time || '');
+const OPENING_HOUR = 9;
+const CLOSING_HOUR = 18;
+const TIME_INTERVAL_MINUTES = 30;
 
-  const isValid = date && time;
+const toLabel = (hours: number, minutes: number) =>
+  format(new Date().setHours(hours, minutes, 0, 0), 'h:mm a');
+
+type TimeOption = { value: string; label: string };
+
+export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) {
+  const initialDate = order.date ? parseISO(order.date) : undefined;
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(initialDate);
+  const [selectedTime, setSelectedTime] = useState(order.time || '');
+
+  const isValid = Boolean(selectedDate && selectedTime);
 
   const handleNext = () => {
-    if (isValid) {
-      onNext({ date, time });
+    if (!selectedDate || !selectedTime) {
+      return;
     }
+
+    onNext({
+      date: format(selectedDate, 'yyyy-MM-dd'),
+      time: selectedTime,
+    });
   };
 
-  // Get minimum date (tomorrow)
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split('T')[0];
+  const tomorrow = addDays(startOfToday(), 1);
+
+  const timeOptions = useMemo<TimeOption[]>(() => {
+    const slots: TimeOption[] = [];
+    for (let hour = OPENING_HOUR; hour <= CLOSING_HOUR; hour++) {
+      for (let minutes = 0; minutes < 60; minutes += TIME_INTERVAL_MINUTES) {
+        if (hour === CLOSING_HOUR && minutes > 0) {
+          break;
+        }
+
+        const value = `${String(hour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        const label = toLabel(hour, minutes);
+        slots.push({ value, label });
+      }
+    }
+
+    return slots;
+  }, []);
 
   return (
-    <div className="space-y-3">
-      <div className="pb-3">
-        <h3 className="text-sm text-primary">When Would You Like Your Cake?</h3>
+    <div className="space-y-6">
+      <div className="space-y-1.5">
+        <h3 className="text-base font-semibold text-primary">When Would You Like Your Cake?</h3>
+        <p className="text-sm text-muted-foreground">
+          Choose a pickup date at least 24 hours in advance and a time during our opening hours.
+        </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="date" className="text-foreground">
-            Pickup Date *
-          </Label>
-          <Input
-            id="date"
-            type="date"
-            min={minDate}
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-            className="border-border bg-card text-foreground"
-          />
-          <p className="text-sm text-muted-foreground">Please order at least 24 hours in advance</p>
+          <Label className="text-sm font-medium text-foreground">Pickup Date *</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  'justify-start gap-2 rounded-full border-border text-left font-normal text-foreground',
+                  'hover:border-accent/80 hover:bg-accent/5',
+                  !selectedDate && 'text-muted-foreground',
+                )}
+              >
+                <CalendarIcon className="size-4" />
+                {selectedDate ? format(selectedDate, 'PPP') : 'Select a pickup date'}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                initialFocus
+                disabled={[{ before: tomorrow }, (date: Date) => date.getDay() === 1]}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="time" className="text-foreground">
-            Pickup Time *
-          </Label>
-          <Input
-            id="time"
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            required
-            className="border-border bg-card text-foreground"
-          />
-        </div>
-
-        <div className="rounded-lg border border-border bg-muted/30 p-4">
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Note:</strong> Our patisserie is open Tuesday to
-            Sunday, 9:00 AM - 6:00 PM. We are closed on Mondays.
-          </p>
+          <Label className="text-sm font-medium text-foreground">Pickup Time *</Label>
+          <Select value={selectedTime} onValueChange={setSelectedTime}>
+            <SelectTrigger className="rounded-full border-border bg-card">
+              <div className="flex items-center gap-2">
+                <Clock className="size-4 text-muted-foreground" />
+                <SelectValue placeholder="Select a pickup time" />
+              </div>
+            </SelectTrigger>
+            <SelectContent position="popper" className="rounded-lg">
+              {timeOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      <div className="flex justify-between">
+      <div className="rounded-2xl border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">Note:</span> Our patisserie is open Tuesday to
+        Sunday, 9:00 AM – 6:00 PM. We are closed on Mondays.
+      </div>
+
+      <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button
           variant="outline"
           onClick={onBack}
           disabled={isFirstStep}
-          className="border-border text-foreground bg-transparent"
+          className="border-border bg-transparent text-foreground"
         >
           Back
         </Button>
         <Button
           onClick={handleNext}
           disabled={!isValid}
-          className="bg-accent text-accent-foreground hover:bg-accent/90"
+          className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
         >
           Review Order
         </Button>

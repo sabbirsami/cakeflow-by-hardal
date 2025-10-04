@@ -78,7 +78,7 @@ export function ContactStep({ order, onNext, onBack, isFirstStep }: ContactStepP
         </div>
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button
           variant="outline"
           onClick={onBack}
@@ -90,7 +90,7 @@ export function ContactStep({ order, onNext, onBack, isFirstStep }: ContactStepP
         <Button
           onClick={handleNext}
           disabled={!isValid}
-          className="bg-accent text-accent-foreground hover:bg-accent/90"
+          className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
         >
           Continue
         </Button>

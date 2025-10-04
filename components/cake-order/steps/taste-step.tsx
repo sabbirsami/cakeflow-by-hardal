@@ -69,7 +69,7 @@ export function TasteStep({ order, onNext, onBack, isFirstStep, onTastesChange }
               return (
                 <CarouselItem
                   key={taste.id}
-                  className="basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/5"
+                  className="flex-[0_0_calc(100%/3)] sm:flex-[0_0_calc(100%/2)] lg:flex-[0_0_calc(100%/3)] xl:flex-[0_0_calc(20%)]"
                 >
                   <Card
                     role="button"

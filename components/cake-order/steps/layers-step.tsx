@@ -56,7 +56,10 @@ export function LayersStep({
         >
           <CarouselContent className="py-2 ">
             {LAYER_OPTIONS.map((layers) => (
-              <CarouselItem key={layers} className="basis-1/2 sm:basis-1/3 lg:basis-1/5">
+              <CarouselItem
+                key={layers}
+                className="flex-[0_0_calc(100%/3)] sm:flex-[0_0_calc(100%/3)] lg:flex-[0_0_calc(100%/5)] xl:flex-[0_0_calc(100%/5)]"
+              >
                 <Card
                   className={`h-full cursor-pointer border-2 p-8 transition-all hover:border-accent ${
                     selectedLayers === layers
