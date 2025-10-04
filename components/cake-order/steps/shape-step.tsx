@@ -10,8 +10,8 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
-import { CAKE_SHAPE_OPTIONS, CakeShapeId } from '../shape-data';
 import { CakeOrder } from '../cake-order-funnel';
+import { CAKE_SHAPE_OPTIONS, CakeShapeId } from '../shape-data';
 
 interface ShapeStepProps {
   order: CakeOrder;
@@ -21,15 +21,9 @@ interface ShapeStepProps {
   onShapeChange?: (shape: CakeShapeId | undefined) => void;
 }
 
-export function ShapeStep({
-  order,
-  onNext,
-  onBack,
-  isFirstStep,
-  onShapeChange,
-}: ShapeStepProps) {
+export function ShapeStep({ order, onNext, onBack, isFirstStep, onShapeChange }: ShapeStepProps) {
   const [selectedShape, setSelectedShape] = useState<CakeShapeId | ''>(
-    (order.shape as CakeShapeId) || ''
+    (order.shape as CakeShapeId) || '',
   );
 
   useEffect(() => {
@@ -49,12 +43,9 @@ export function ShapeStep({
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h3 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-foreground">
-          Choose Your Cake Shape
-        </h3>
-        <p className="mt-2 text-muted-foreground">Select the shape that best fits your vision</p>
+    <div className="space-y-3">
+      <div className="pb-3">
+        <h3 className="text-sm text-foreground">Choose Your Cake Shape</h3>
       </div>
 
       <div className="relative">
@@ -94,9 +85,7 @@ export function ShapeStep({
                           />
                         </div>
                       </div>
-                      <span className="font-semibold text-foreground">
-                        {shape.name}
-                      </span>
+                      <span className="font-semibold text-foreground">{shape.name}</span>
                     </div>
                   </Card>
                 </CarouselItem>
@@ -108,7 +97,7 @@ export function ShapeStep({
         </Carousel>
       </div>
 
-      <div className="flex justify-between pt-6">
+      <div className="flex justify-between">
         <Button
           variant="outline"
           onClick={onBack}

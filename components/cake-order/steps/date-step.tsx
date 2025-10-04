@@ -31,15 +31,12 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
   const minDate = tomorrow.toISOString().split('T')[0];
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h3 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-foreground">
-          When Would You Like Your Cake?
-        </h3>
-        <p className="mt-2 text-muted-foreground">Select your preferred pickup date and time</p>
+    <div className="space-y-3">
+      <div className="pb-3">
+        <h3 className="text-sm text-foreground">When Would You Like Your Cake?</h3>
       </div>
 
-      <div className="mx-auto max-w-md space-y-6">
+      <div className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="date" className="text-foreground">
             Pickup Date *
@@ -78,7 +75,7 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
         </div>
       </div>
 
-      <div className="flex justify-between pt-6">
+      <div className="flex justify-between">
         <Button
           variant="outline"
           onClick={onBack}

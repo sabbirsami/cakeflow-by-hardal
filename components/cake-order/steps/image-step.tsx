@@ -46,17 +46,12 @@ export function ImageStep({ order, onNext, onBack, isFirstStep }: ImageStepProps
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h3 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-foreground">
-          Upload Reference Image
-        </h3>
-        <p className="mt-2 text-muted-foreground">
-          Optional: Share an image of your desired cake design
-        </p>
+    <div className="space-y-3">
+      <div className="pb-3">
+        <h3 className="text-sm text-foreground">Upload Reference Image</h3>
       </div>
 
-      <div className="mx-auto max-w-md space-y-4">
+      <div className="space-y-4">
         <div className="space-y-2">
           <Label className="text-foreground">Reference Image</Label>
           <div
@@ -122,7 +117,7 @@ export function ImageStep({ order, onNext, onBack, isFirstStep }: ImageStepProps
         </div>
       </div>
 
-      <div className="flex justify-between pt-6">
+      <div className="flex justify-between">
         <Button
           variant="outline"
           onClick={onBack}

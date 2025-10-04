@@ -52,14 +52,9 @@ export function TasteStep({ order, onNext, onBack, isFirstStep, onTastesChange }
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h3 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-foreground">
-          Select Your Flavors
-        </h3>
-        <p className="mt-2 text-muted-foreground">
-          Choose one or more flavors for your cake layers
-        </p>
+    <div className="space-y-3">
+      <div className="pb-3">
+        <h3 className="text-sm text-foreground"> Select Your Flavors</h3>
       </div>
 
       <div className="relative">
@@ -115,7 +110,7 @@ export function TasteStep({ order, onNext, onBack, isFirstStep, onTastesChange }
         </Carousel>
       </div>
 
-      <div className="flex justify-between pt-6">
+      <div className="flex justify-between">
         <Button
           variant="outline"
           onClick={onBack}

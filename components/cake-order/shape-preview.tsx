@@ -5,6 +5,7 @@ export type ShapePreviewProps = {
   shape?: CakeShapeId;
   layers?: number;
   tastes?: string[];
+  message?: string;
   className?: string;
 };
 
@@ -29,10 +30,15 @@ function layerSideFill(i: number, layers: number) {
   return `hsl(${baseHue} ${sat}% ${l}%)`;
 }
 
-const depth = 28; // px vertical offset between layers (visual height)
+const depth = 24; // px vertical offset between layers (visual height)
 const BASE_SCALE = 1.4;
 const TAPER_SPREAD = 0.35;
 const TOP_INNER_SHRINK = 0.06;
+const BASE_VERTICAL_OFFSET = -8;
+const MESSAGE_MAX_CHARS_PER_LINE = 12;
+const MESSAGE_MAX_LINES = 3;
+const MESSAGE_CENTER_Y = 82;
+const MESSAGE_LINE_HEIGHT = 10;
 
 function adjustLightness(hsl: string, delta: number) {
   const match = /hsl\(([^\s]+)\s+([^%]+)%\s+([^%]+)%\)/.exec(hsl);
@@ -40,6 +46,45 @@ function adjustLightness(hsl: string, delta: number) {
   const [, h, s, l] = match;
   const nextL = Math.max(0, Math.min(100, parseFloat(l) + delta));
   return `hsl(${h} ${s}% ${nextL}%)`;
+}
+
+function toCapitalized(sentence: string) {
+  return sentence.replace(/(^|\s)([a-zá-öø-ÿ])/gi, (match) => match.toUpperCase());
+}
+
+function wrapMessage(message: string): string[] {
+  const normalized = message.trim().replace(/\s+/g, ' ');
+  if (!normalized) return [];
+
+  const lines: string[] = [];
+  let remaining = normalized;
+
+  for (let i = 0; i < MESSAGE_MAX_LINES && remaining; i++) {
+    if (remaining.length <= MESSAGE_MAX_CHARS_PER_LINE) {
+      lines.push(remaining);
+      remaining = '';
+      break;
+    }
+
+    const slice = remaining.slice(0, MESSAGE_MAX_CHARS_PER_LINE + 1);
+    const lastSpace = slice.lastIndexOf(' ');
+
+    if (lastSpace > 0) {
+      lines.push(remaining.slice(0, lastSpace));
+      remaining = remaining.slice(lastSpace + 1).trimStart();
+    } else {
+      lines.push(remaining.slice(0, MESSAGE_MAX_CHARS_PER_LINE));
+      remaining = remaining.slice(MESSAGE_MAX_CHARS_PER_LINE).trimStart();
+    }
+  }
+
+  if (remaining.length > 0 && lines.length > 0) {
+    const lastIndex = lines.length - 1;
+    const base = lines[lastIndex].slice(0, Math.max(0, MESSAGE_MAX_CHARS_PER_LINE - 1)).trimEnd();
+    lines[lastIndex] = `${base}…`;
+  }
+
+  return lines;
 }
 
 type ShapeDef = {
@@ -86,26 +131,26 @@ function shapeDef(shape: CakeShapeId): ShapeDef {
   }
 }
 
+function getShapeTransform(scaleMultiplier = 1, extra?: string | number | readonly string[]) {
+  const baseScale = (BASE_SCALE * scaleMultiplier).toFixed(4);
+  const transformParts = ['translate(100 100)', `scale(${baseScale})`, 'translate(-100 -100)'];
+  if (extra) {
+    transformParts.push(extra.toString());
+  }
+  return transformParts.join(' ');
+}
+
 function renderShape(
   shape: CakeShapeId,
   extra: React.SVGProps<SVGElement> = {},
-  scaleMultiplier = 1
+  scaleMultiplier = 1,
 ) {
   const def = shapeDef(shape);
   const { transform, ...rest } = extra;
-  const baseScale = (BASE_SCALE * scaleMultiplier).toFixed(4);
-  const transformParts = [
-    'translate(100 100)',
-    `scale(${baseScale})`,
-    'translate(-100 -100)',
-  ];
-  if (transform) {
-    transformParts.push(transform.toString());
-  }
   return React.createElement(def.tag, {
     ...def.attrs,
     ...rest,
-    transform: transformParts.join(' '),
+    transform: getShapeTransform(scaleMultiplier, transform),
   });
 }
 
@@ -120,7 +165,7 @@ const TASTE_COLORS: Record<string, string> = {
   coffee: 'hsl(30 35% 35%)',
 };
 
-export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePreviewProps) {
+export function ShapePreview({ shape, layers = 1, tastes, message, className }: ShapePreviewProps) {
   if (!shape) return null;
   const L = Math.max(1, Math.min(layers, 8)); // clamp for visuals
   const gradientPrefix = useId();
@@ -128,10 +173,11 @@ export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePrev
   const sideStroke = 'rgba(0,0,0,0.08)';
   const topStroke = 'rgba(0,0,0,0.12)';
   const highlightStroke = 'rgba(255,255,255,0.85)';
+  const messageLines = message ? wrapMessage(message) : [];
 
   const layerConfigs = Array.from({ length: L }).map((_, idx) => {
     const i = L - 1 - idx; // bottom first
-    const y = i * depth;
+    const y = i * depth + BASE_VERTICAL_OFFSET;
     const denom = Math.max(L - 1, 1);
     const taperRatio = L > 1 ? i / denom : 0.5;
     const scale = 1 - TAPER_SPREAD / 2 + taperRatio * TAPER_SPREAD;
@@ -155,6 +201,9 @@ export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePrev
       topGradientId,
     };
   });
+
+  const topConfig = layerConfigs.find((cfg) => cfg.i === 0);
+  const topClipId = topConfig ? `${gradientPrefix}-clip-top` : undefined;
 
   return (
     <svg
@@ -185,11 +234,23 @@ export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePrev
             </radialGradient>
           </React.Fragment>
         ))}
+        {topConfig && topClipId && (
+          <clipPath id={topClipId}>
+            {renderShape(shape, { fill: '#fff' }, topConfig.topScale)}
+          </clipPath>
+        )}
       </defs>
 
       {/* Ground shadow */}
       <ellipse cx={100} cy={165 + (L - 1) * (depth / 2)} rx={115} ry={20} fill="rgba(0,0,0,0.18)" />
-      <ellipse cx={100} cy={160 + (L - 1) * (depth / 2)} rx={105} ry={16} fill="url(#plate)" opacity={0.55} />
+      <ellipse
+        cx={100}
+        cy={160 + (L - 1) * (depth / 2)}
+        rx={105}
+        ry={16}
+        fill="url(#plate)"
+        opacity={0.55}
+      />
 
       {/* Layers: bottom to top */}
       {layerConfigs.map(({ i, y, scale, topScale, sideGradientId, topGradientId }) => (
@@ -203,7 +264,7 @@ export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePrev
                 stroke: sideStroke,
                 strokeWidth: 1.2,
               },
-              scale
+              scale,
             )}
           </g>
 
@@ -216,7 +277,7 @@ export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePrev
                 stroke: topStroke,
                 strokeWidth: 1.15,
               },
-              topScale
+              topScale,
             )}
             {renderShape(
               shape,
@@ -226,7 +287,42 @@ export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePrev
                 strokeWidth: 1.35,
                 opacity: 0.7,
               },
-              topScale
+              topScale,
+            )}
+            {i === 0 && messageLines.length > 0 && (
+              <g
+                transform={getShapeTransform(topScale)}
+                clipPath={topClipId ? `url(#${topClipId})` : undefined}
+              >
+                <text
+                  x={100}
+                  y={MESSAGE_CENTER_Y - ((messageLines.length - 1) * MESSAGE_LINE_HEIGHT) / 2}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="rgba(70, 35, 20, 0.9)"
+                  stroke="rgba(255, 255, 255, 0.78)"
+                  strokeWidth={0.7}
+                  fontFamily="'Playfair Display', serif"
+                  fontWeight={600}
+                  fontSize={12}
+                  letterSpacing={0.35}
+                  style={{ paintOrder: 'stroke fill' }}
+                >
+                  {messageLines.map((line, index) => (
+                    <tspan
+                      key={line + index}
+                      x={100}
+                      y={
+                        MESSAGE_CENTER_Y -
+                        ((messageLines.length - 1) * MESSAGE_LINE_HEIGHT) / 2 +
+                        index * MESSAGE_LINE_HEIGHT
+                      }
+                    >
+                      {toCapitalized(line)}
+                    </tspan>
+                  ))}
+                </text>
+              </g>
             )}
           </g>
         </g>

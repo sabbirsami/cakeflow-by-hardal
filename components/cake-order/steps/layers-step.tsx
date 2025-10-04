@@ -15,7 +15,13 @@ interface LayersStepProps {
 
 const LAYER_OPTIONS = [1, 2, 3, 4, 5];
 
-export function LayersStep({ order, onNext, onBack, isFirstStep, onLayersChange }: LayersStepProps) {
+export function LayersStep({
+  order,
+  onNext,
+  onBack,
+  isFirstStep,
+  onLayersChange,
+}: LayersStepProps) {
   const [selectedLayers, setSelectedLayers] = useState(order.layers || 0);
 
   useEffect(() => {
@@ -31,12 +37,9 @@ export function LayersStep({ order, onNext, onBack, isFirstStep, onLayersChange 
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h3 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-foreground">
-          How Many Layers?
-        </h3>
-        <p className="mt-2 text-muted-foreground">Choose the number of layers for your cake</p>
+    <div className="space-y-3">
+      <div className="pb-3">
+        <h3 className="text-sm text-foreground">How Many Layers?</h3>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -68,7 +71,7 @@ export function LayersStep({ order, onNext, onBack, isFirstStep, onLayersChange 
         ))}
       </div>
 
-      <div className="flex justify-between pt-6">
+      <div className="flex justify-between">
         <Button
           variant="outline"
           onClick={onBack}

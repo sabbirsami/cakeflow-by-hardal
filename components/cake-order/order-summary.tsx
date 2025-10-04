@@ -8,11 +8,11 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
   return (
-    <div className="border-2 border-border bg-card p-8 shadow-sm">
-      <h3 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-foreground mb-2">
+    <div className="border-s- border-border bg-card p-8 shadow-sm">
+      <h3 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-foreground ">
         Your Cake
       </h3>
-      <p className="text-sm text-muted-foreground mb-8">Order Summary</p>
+      <p className="text-sm text-muted-foreground mb-8">Your Order Summary</p>
 
       <div className="space-y-6">
         {/* Shape */}

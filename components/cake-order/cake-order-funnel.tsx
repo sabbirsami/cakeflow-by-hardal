@@ -47,6 +47,7 @@ export function CakeOrderFunnel() {
   );
   const [previewLayers, setPreviewLayers] = useState<number | undefined>(order.layers);
   const [previewTastes, setPreviewTastes] = useState<string[] | undefined>(order.tastes);
+  const [previewMessage, setPreviewMessage] = useState<string | undefined>(order.text);
 
   useEffect(() => {
     setPreviewShape(order.shape as CakeShapeId | undefined);
@@ -66,6 +67,10 @@ export function CakeOrderFunnel() {
     setPreviewTastes(order.tastes);
   }, [order.tastes]);
 
+  useEffect(() => {
+    setPreviewMessage(order.text);
+  }, [order.text]);
+
   const handleNext = (data: Partial<CakeOrder>) => {
     const updatedOrder = { ...order, ...data };
     setOrder(updatedOrder);
@@ -80,6 +85,10 @@ export function CakeOrderFunnel() {
 
     if (data.tastes) {
       setPreviewTastes(data.tastes);
+    }
+
+    if (typeof data.text === 'string') {
+      setPreviewMessage(data.text);
     }
 
     if (currentStep === STEPS.length) {
@@ -110,6 +119,48 @@ export function CakeOrderFunnel() {
   const isShapeStep = currentStep === 1;
   const isLayersStep = currentStep === 2;
   const isTasteStep = currentStep === 3;
+  const isTextStep = currentStep === 4;
+
+  const stepContent = isShapeStep ? (
+    <ShapeStep
+      order={order}
+      onNext={handleNext}
+      onBack={handleBack}
+      isFirstStep={currentStep === 1}
+      onShapeChange={(shape) => setPreviewShape(shape)}
+    />
+  ) : isLayersStep ? (
+    <LayersStep
+      order={order}
+      onNext={handleNext}
+      onBack={handleBack}
+      isFirstStep={false}
+      onLayersChange={(n: number) => setPreviewLayers(n)}
+    />
+  ) : isTasteStep ? (
+    <TasteStep
+      order={order}
+      onNext={handleNext}
+      onBack={handleBack}
+      isFirstStep={false}
+      onTastesChange={(t: string[]) => setPreviewTastes(t)}
+    />
+  ) : isTextStep ? (
+    <TextStep
+      order={order}
+      onNext={handleNext}
+      onBack={handleBack}
+      isFirstStep={false}
+      onTextChange={(text) => setPreviewMessage(text)}
+    />
+  ) : (
+    <CurrentStepComponent
+      order={order}
+      onNext={handleNext}
+      onBack={handleBack}
+      isFirstStep={currentStep === 1}
+    />
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,7 +181,7 @@ export function CakeOrderFunnel() {
       </header>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 pb-12 pt-20">
+      <div className="container mx-auto px-4 pb-12 pt-16">
         <div className="">
           {/* Title */}
           {/* <div className="mb-12 border-b border-border pb-6">
@@ -157,14 +208,15 @@ export function CakeOrderFunnel() {
 
             {/* Middle Column - Form Content */}
             <div className="w-full col-span-full lg:col-span-7 px-0 lg:px-10">
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-8 lg:min-h-[540px]">
                 <div className="hidden lg:flex items-center justify-center text-foreground/90">
                   {previewShape ? (
                     <ShapePreview
                       shape={previewShape}
                       layers={previewLayers ?? order.layers ?? 1}
                       tastes={previewTastes ?? order.tastes ?? []}
-                      className="w-full max-w-[300px]"
+                      message={previewMessage ?? order.text ?? ''}
+                      className="w-full max-w-[350px]"
                     />
                   ) : (
                     <div className="text-center text-muted-foreground">
@@ -172,40 +224,7 @@ export function CakeOrderFunnel() {
                     </div>
                   )}
                 </div>
-                <div>
-                  {isShapeStep ? (
-                    <ShapeStep
-                      order={order}
-                      onNext={handleNext}
-                      onBack={handleBack}
-                      isFirstStep={currentStep === 1}
-                      onShapeChange={(shape) => setPreviewShape(shape)}
-                    />
-                  ) : isLayersStep ? (
-                    <LayersStep
-                      order={order}
-                      onNext={handleNext}
-                      onBack={handleBack}
-                      isFirstStep={false}
-                      onLayersChange={(n: number) => setPreviewLayers(n)}
-                    />
-                  ) : isTasteStep ? (
-                    <TasteStep
-                      order={order}
-                      onNext={handleNext}
-                      onBack={handleBack}
-                      isFirstStep={false}
-                      onTastesChange={(t: string[]) => setPreviewTastes(t)}
-                    />
-                  ) : (
-                    <CurrentStepComponent
-                      order={order}
-                      onNext={handleNext}
-                      onBack={handleBack}
-                      isFirstStep={currentStep === 1}
-                    />
-                  )}
-                </div>
+                <div className="mt-6 lg:mt-auto">{stepContent}</div>
               </div>
               <div className="mt-6 lg:hidden">
                 <div className="flex items-center justify-center  p-5 text-foreground/90">
@@ -214,6 +233,7 @@ export function CakeOrderFunnel() {
                       shape={previewShape}
                       layers={previewLayers ?? order.layers ?? 1}
                       tastes={previewTastes ?? order.tastes ?? []}
+                      message={previewMessage ?? order.text ?? ''}
                       className="w-full max-w-[160px]"
                     />
                   ) : (

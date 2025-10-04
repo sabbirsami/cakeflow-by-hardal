@@ -27,15 +27,12 @@ export function ContactStep({ order, onNext, onBack, isFirstStep }: ContactStepP
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h3 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-foreground">
-          Your Contact Information
-        </h3>
-        <p className="mt-2 text-muted-foreground">{"We'll use this to confirm your order"}</p>
+    <div className="space-y-3">
+      <div className="pb-3">
+        <h3 className="text-sm text-foreground">Your Contact Information</h3>
       </div>
 
-      <div className="mx-auto max-w-md space-y-6">
+      <div className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="name" className="text-foreground">
             Full Name *
@@ -81,7 +78,7 @@ export function ContactStep({ order, onNext, onBack, isFirstStep }: ContactStepP
         </div>
       </div>
 
-      <div className="flex justify-between pt-6">
+      <div className="flex justify-between">
         <Button
           variant="outline"
           onClick={onBack}
