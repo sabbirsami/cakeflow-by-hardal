@@ -39,6 +39,9 @@ const MESSAGE_MAX_CHARS_PER_LINE = 12;
 const MESSAGE_MAX_LINES = 3;
 const MESSAGE_CENTER_Y = 82;
 const MESSAGE_LINE_HEIGHT = 10;
+const TOP_GLOSS_SHRINK = 0.92;
+const TOP_INNER_SHADE_SHRINK = 0.96;
+const SIDE_RIM_SHRINK = 0.995;
 
 function adjustLightness(hsl: string, delta: number) {
   const match = /hsl\(([^\s]+)\s+([^%]+)%\s+([^%]+)%\)/.exec(hsl);
@@ -99,12 +102,12 @@ function shapeDef(shape: CakeShapeId): ShapeDef {
     case 'square':
       return {
         tag: 'rect',
-        attrs: { x: 40, y: 35, width: 120, height: 70, rx: 12, ry: 12 },
+        attrs: { x: 40, y: 35, width: 120, height: 70, rx: 6, ry: 6 },
       } as any;
     case 'rectangle':
       return {
         tag: 'rect',
-        attrs: { x: 30, y: 50, width: 140, height: 50, rx: 10, ry: 10 },
+        attrs: { x: 30, y: 50, width: 140, height: 50, rx: 4, ry: 4 },
       } as any;
     case 'hexagon':
       return {
@@ -190,6 +193,16 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
     const sideBase = tasteColor ?? layerSideFill(i, L);
     const sideGradientId = `${gradientPrefix}-side-${i}`;
     const topGradientId = `${gradientPrefix}-top-${i}`;
+    const sideSpecId = `${gradientPrefix}-side-spec-${i}`;
+    const sideAoId = `${gradientPrefix}-side-ao-${i}`;
+    const interLayerShadeId = `${gradientPrefix}-inter-${i}`;
+    const topGlossId = `${gradientPrefix}-top-gloss-${i}`;
+    const topInnerShadeId = `${gradientPrefix}-top-inner-${i}`;
+    const topRimHighlightId = `${gradientPrefix}-top-rim-${i}`;
+    const topSpotHighlightId = `${gradientPrefix}-top-spot-${i}`;
+    const frontHighlightId = `${gradientPrefix}-front-hi-${i}`;
+    const frontShadowId = `${gradientPrefix}-front-sh-${i}`;
+    const frontClipId = `${gradientPrefix}-front-clip-${i}`;
     return {
       i,
       y,
@@ -199,6 +212,16 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
       sideBase,
       sideGradientId,
       topGradientId,
+      sideSpecId,
+      sideAoId,
+      interLayerShadeId,
+      topGlossId,
+      topInnerShadeId,
+      topRimHighlightId,
+      topSpotHighlightId,
+      frontHighlightId,
+      frontShadowId,
+      frontClipId,
     };
   });
 
@@ -216,22 +239,102 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
         <filter id="ds" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="6" stdDeviation="6" floodOpacity="0.18" />
         </filter>
+        <filter id="cakeNoise" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="3" seed="12" result="noise" />
+          <feColorMatrix
+            in="noise"
+            type="matrix"
+            values="0 0 0 0 0.8  0 0 0 0 0.65  0 0 0 0 0.55  0 0 0 0 0"
+          />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.04" intercept="0.02" />
+          </feComponentTransfer>
+          <feBlend in="SourceGraphic" mode="overlay" />
+        </filter>
         <radialGradient id="plate" cx="50%" cy="50%" r="70%">
           <stop offset="0%" stopColor="rgba(255,255,255,0.18)" />
           <stop offset="100%" stopColor="rgba(0,0,0,0.2)" stopOpacity="0.25" />
         </radialGradient>
-        {layerConfigs.map(({ sideBase, sideGradientId, topFill, topGradientId }) => (
+        {layerConfigs.map(
+          ({
+            sideBase,
+            sideGradientId,
+            topFill,
+            topGradientId,
+            sideSpecId,
+            sideAoId,
+            interLayerShadeId,
+            topGlossId,
+            topInnerShadeId,
+            topRimHighlightId,
+            topSpotHighlightId,
+            frontHighlightId,
+            frontShadowId,
+            frontClipId,
+          }) => (
           <React.Fragment key={sideGradientId}>
             <linearGradient id={sideGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor={adjustLightness(sideBase, 12)} />
               <stop offset="55%" stopColor={sideBase} />
               <stop offset="100%" stopColor={adjustLightness(sideBase, -12)} />
             </linearGradient>
+            <linearGradient id={sideSpecId} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity={0} />
+              <stop offset="28%" stopColor="#ffffff" stopOpacity={0.22} />
+              <stop offset="60%" stopColor="#000000" stopOpacity={0.12} />
+              <stop offset="100%" stopColor="#000000" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id={sideAoId} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgba(0,0,0,0.32)" />
+              <stop offset="10%" stopColor="rgba(0,0,0,0.18)" />
+              <stop offset="50%" stopColor="rgba(0,0,0,0.05)" />
+              <stop offset="90%" stopColor="rgba(0,0,0,0.18)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0.32)" />
+            </linearGradient>
+            <linearGradient id={interLayerShadeId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="rgba(0,0,0,0.35)" />
+              <stop offset="60%" stopColor="rgba(0,0,0,0.05)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+            </linearGradient>
             <radialGradient id={topGradientId} cx="50%" cy="32%" r="70%">
               <stop offset="0%" stopColor={adjustLightness(topFill, 16)} />
               <stop offset="65%" stopColor={topFill} />
               <stop offset="100%" stopColor={adjustLightness(topFill, -8)} />
             </radialGradient>
+            <radialGradient id={topGlossId} cx="45%" cy="28%" r="55%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity={0.55} />
+              <stop offset="45%" stopColor="#ffffff" stopOpacity={0.1} />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
+            </radialGradient>
+            <radialGradient id={topInnerShadeId} cx="50%" cy="70%" r="78%">
+              <stop offset="0%" stopColor="#000000" stopOpacity={0} />
+              <stop offset="65%" stopColor="#000000" stopOpacity={0.12} />
+              <stop offset="100%" stopColor="#000000" stopOpacity={0.22} />
+            </radialGradient>
+            <radialGradient id={topRimHighlightId} cx="50%" cy="50%" r="72%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+              <stop offset="65%" stopColor="rgba(255,255,255,0)" />
+              <stop offset="88%" stopColor="rgba(255,255,255,0.55)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            </radialGradient>
+            <radialGradient id={topSpotHighlightId} cx="38%" cy="26%" r="32%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.85)" />
+              <stop offset="45%" stopColor="rgba(255,255,255,0.35)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            </radialGradient>
+            <linearGradient id={frontHighlightId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.75)" />
+              <stop offset="55%" stopColor="rgba(255,255,255,0.25)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            </linearGradient>
+            <linearGradient id={frontShadowId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="rgba(0,0,0,0)" />
+              <stop offset="35%" stopColor="rgba(0,0,0,0.25)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0.5)" />
+            </linearGradient>
+            <clipPath id={frontClipId}>
+              {renderShape(shape, { fill: '#fff', transform: 'translate(0 18) scale(1 0.55)' }, 1)}
+            </clipPath>
           </React.Fragment>
         ))}
         {topConfig && topClipId && (
@@ -253,7 +356,22 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
       />
 
       {/* Layers: bottom to top */}
-      {layerConfigs.map(({ i, y, scale, topScale, sideGradientId, topGradientId }) => (
+      {layerConfigs.map(
+        ({
+          i,
+          y,
+          scale,
+          topScale,
+          sideGradientId,
+          sideSpecId,
+          sideAoId,
+          interLayerShadeId,
+          topGradientId,
+          topGlossId,
+          topInnerShadeId,
+          topRimHighlightId,
+          topSpotHighlightId,
+        }) => (
         <g key={i}>
           {/* Side face (offset down) */}
           <g transform={`translate(0, ${y + depth / 2})`}>
@@ -261,10 +379,42 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
               shape,
               {
                 fill: `url(#${sideGradientId})`,
-                stroke: sideStroke,
-                strokeWidth: 1.2,
               },
               scale,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${sideSpecId})`,
+                opacity: 0.55,
+                filter: 'url(#cakeNoise)',
+              },
+              scale,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${sideAoId})`,
+                opacity: 0.3,
+              },
+              scale,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${interLayerShadeId})`,
+                opacity: 0.4,
+              },
+              scale,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: 'rgba(0,0,0,0.25)',
+                opacity: 0.35,
+                transform: 'translate(0 3) scale(1, 1.04)',
+              },
+              scale * SIDE_RIM_SHRINK,
             )}
           </g>
 
@@ -276,6 +426,7 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
                 fill: `url(#${topGradientId})`,
                 stroke: topStroke,
                 strokeWidth: 1.15,
+                filter: 'url(#cakeNoise)',
               },
               topScale,
             )}
@@ -288,6 +439,38 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
                 opacity: 0.7,
               },
               topScale,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${topInnerShadeId})`,
+                opacity: 0.38,
+              },
+              topScale,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${topGlossId})`,
+                opacity: 0.6,
+              },
+              topScale * TOP_GLOSS_SHRINK,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${topRimHighlightId})`,
+                opacity: 0.55,
+              },
+              topScale,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${topSpotHighlightId})`,
+                opacity: 0.8,
+              },
+              topScale * 0.75,
             )}
             {i === 0 && messageLines.length > 0 && (
               <g
