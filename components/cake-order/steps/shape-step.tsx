@@ -45,7 +45,7 @@ export function ShapeStep({ order, onNext, onBack, isFirstStep, onShapeChange }:
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-foreground">Choose Your Cake Shape</h3>
+        <h3 className="text-sm text-primary">Choose Your Cake Shape</h3>
       </div>
 
       <div className="relative">

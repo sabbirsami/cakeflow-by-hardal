@@ -33,7 +33,7 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-foreground">When Would You Like Your Cake?</h3>
+        <h3 className="text-sm text-primary">When Would You Like Your Cake?</h3>
       </div>
 
       <div className="space-y-6">

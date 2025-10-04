@@ -29,7 +29,7 @@ export function ContactStep({ order, onNext, onBack, isFirstStep }: ContactStepP
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-foreground">Your Contact Information</h3>
+        <h3 className="text-sm text-primary">Your Contact Information</h3>
       </div>
 
       <div className="space-y-6">

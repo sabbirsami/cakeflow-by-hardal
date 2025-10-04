@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { Cake } from 'lucide-react';
 import Image from 'next/image';
 import { OrderSummary } from './order-summary';
 import { CakeShapeId } from './shape-data';
@@ -181,53 +182,44 @@ export function CakeOrderFunnel() {
       </header>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 pb-12 pt-16">
-        <div className="">
-          {/* Title */}
-          {/* <div className="mb-12 border-b border-border pb-6">
-            <h2 className="font-[family-name:var(--font-playfair)] text-4xl font-bold text-foreground md:text-5xl text-balance">
-              Create Your Custom Cake
-            </h2>
-            <p className="ps-1 text-muted-foreground">
-              Design your perfect cake in just a few simple steps
-            </p>
-          </div> */}
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8 items-start">
+      <div className="container mx-auto px-4 pb-16 pt-10 sm:pt-12 lg:pb-0 lg:pt-0">
+        <div>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10 items-start lg:h-[calc(100vh-6rem)]">
             {/* Left Column - Step Navigation */}
-            <div className="hidden lg:block col-span-2">
-              <div className="sticky top-8">
+            <div className="hidden lg:block col-span-2 h-full border-e border-border/60 pr-6 pt-10">
+              <div className="sticky top-16">
                 <StepIndicator steps={STEPS} currentStep={currentStep} vertical />
               </div>
             </div>
 
             {/* Mobile Step Indicator - Horizontal */}
-            <div className="lg:hidden col-span-full">
+            <div className="lg:hidden col-span-full -mx-2 rounded-xl border border-border/50 bg-card/40 p-3">
               <StepIndicator steps={STEPS} currentStep={currentStep} />
             </div>
 
             {/* Middle Column - Form Content */}
-            <div className="w-full col-span-full lg:col-span-7 px-0 lg:px-10">
+            <div className="w-full col-span-full lg:col-span-7 px-1 sm:px-3 lg:px-6">
               <div className="flex flex-col gap-8 lg:min-h-[540px]">
-                <div className="hidden lg:flex items-center justify-center text-foreground/90">
+                <div className="hidden lg:flex items-center justify-center border-b px-10 py-8 text-foreground/90">
                   {previewShape ? (
                     <ShapePreview
                       shape={previewShape}
                       layers={previewLayers ?? order.layers ?? 1}
                       tastes={previewTastes ?? order.tastes ?? []}
                       message={previewMessage ?? order.text ?? ''}
-                      className="w-full max-w-[350px]"
+                      className="w-full max-w-[360px]"
                     />
                   ) : (
                     <div className="text-center text-muted-foreground">
+                      <Cake className="h-20 w-20 text-muted-foreground/30 mx-auto mb-6" />
                       Select a shape to preview your cake
                     </div>
                   )}
                 </div>
-                <div className="mt-6 lg:mt-auto">{stepContent}</div>
+                <div className="mt-8 lg:mt-auto">{stepContent}</div>
               </div>
-              <div className="mt-6 lg:hidden">
-                <div className="flex items-center justify-center  p-5 text-foreground/90">
+              <div className="mt-8 lg:hidden">
+                <div className="flex items-center justify-center rounded-3xl border border-border/60 bg-card/60 p-6 text-foreground/90">
                   {previewShape ? (
                     <ShapePreview
                       shape={previewShape}
@@ -246,15 +238,15 @@ export function CakeOrderFunnel() {
             </div>
 
             {/* Right Column - Order Summary (Sticky) */}
-            <div className="hidden lg:block col-span-3">
-              <div className="sticky top-8">
+            <div className="hidden lg:block col-span-3 h-full border-s border-border/60 pl-6">
+              <div className="sticky top-16">
                 <OrderSummary order={order} currentStep={currentStep} />
               </div>
             </div>
           </div>
 
           {/* Mobile Summary - Show at bottom on mobile */}
-          <div className="lg:hidden mt-8">
+          <div className="lg:hidden mt-10">
             <OrderSummary order={order} currentStep={currentStep} />
           </div>
         </div>

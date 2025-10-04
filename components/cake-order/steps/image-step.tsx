@@ -48,7 +48,7 @@ export function ImageStep({ order, onNext, onBack, isFirstStep }: ImageStepProps
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-foreground">Upload Reference Image</h3>
+        <h3 className="text-sm text-primary">Upload Reference Image</h3>
       </div>
 
       <div className="space-y-4">

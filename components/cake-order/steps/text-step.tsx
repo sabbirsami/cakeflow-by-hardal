@@ -33,7 +33,7 @@ export function TextStep({ order, onNext, onBack, isFirstStep, onTextChange }: T
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-foreground">Add a Personal Message</h3>
+        <h3 className="text-sm text-primary">Add a Personal Message</h3>
       </div>
 
       <div className=" space-y-4">

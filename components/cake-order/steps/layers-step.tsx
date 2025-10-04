@@ -2,6 +2,13 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
 import type { CakeOrder } from '../cake-order-funnel';
 
@@ -39,36 +46,48 @@ export function LayersStep({
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-foreground">How Many Layers?</h3>
+        <h3 className="text-sm text-primary">How Many Layers?</h3>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        {LAYER_OPTIONS.map((layers) => (
-          <Card
-            key={layers}
-            className={`cursor-pointer border-2 p-8 transition-all hover:border-accent ${
-              selectedLayers === layers ? 'border-accent bg-accent/5' : 'border-border bg-card'
-            }`}
-            onClick={() => setSelectedLayers(layers)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setSelectedLayers(layers);
-              }
-            }}
-          >
-            <div className="flex flex-col items-center gap-2 text-center">
-              <span className="font-[family-name:var(--font-playfair)] text-4xl font-bold text-foreground">
-                {layers}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {layers === 1 ? 'Layer' : 'Layers'}
-              </span>
-            </div>
-          </Card>
-        ))}
+      <div className="relative">
+        <Carousel
+          opts={{ align: 'start', dragFree: true, containScroll: 'trimSnaps' }}
+          className="w-full"
+        >
+          <CarouselContent className="py-2 ">
+            {LAYER_OPTIONS.map((layers) => (
+              <CarouselItem key={layers} className="basis-1/2 sm:basis-1/3 lg:basis-1/5">
+                <Card
+                  className={`h-full cursor-pointer border-2 p-8 transition-all hover:border-accent ${
+                    selectedLayers === layers
+                      ? 'border-accent bg-accent/5'
+                      : 'border-border bg-card'
+                  }`}
+                  onClick={() => setSelectedLayers(layers)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedLayers(layers);
+                    }
+                  }}
+                >
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <span className="font-[family-name:var(--font-playfair)] text-4xl font-bold text-foreground">
+                      {layers}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {layers === 1 ? 'Layer' : 'Layers'}
+                    </span>
+                  </div>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden sm:flex" />
+          <CarouselNext className="hidden sm:flex" />
+        </Carousel>
       </div>
 
       <div className="flex justify-between">

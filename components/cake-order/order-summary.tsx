@@ -160,8 +160,8 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
 
         {/* Empty State */}
         {!order.shape && currentStep === 1 && (
-          <div className="text-center py-12">
-            <Cake className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+          <div className=" py-12">
+            <Cake className="h-12 w-12 text-muted-foreground/30  mb-4" />
             <p className="text-muted-foreground text-sm">
               Your selections will appear here as you progress through the steps
             </p>

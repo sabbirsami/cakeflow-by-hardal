@@ -54,7 +54,7 @@ export function TasteStep({ order, onNext, onBack, isFirstStep, onTastesChange }
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-foreground"> Select Your Flavors</h3>
+        <h3 className="text-sm text-primary"> Select Your Flavors</h3>
       </div>
 
       <div className="relative">
