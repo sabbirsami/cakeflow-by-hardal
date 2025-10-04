@@ -3,6 +3,7 @@
 import useEmblaCarousel, { type UseEmblaCarouselType } from 'embla-carousel-react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import * as React from 'react';
+import { motion, type Variants } from 'framer-motion';
 import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -138,12 +139,34 @@ function Carousel({
   );
 }
 
-function CarouselContent({ className, ...props }: React.ComponentProps<'div'>) {
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.08,
+    },
+  },
+} satisfies Variants;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: 'easeOut' },
+  },
+} satisfies Variants;
+
+function CarouselContent({ className, ...props }: Omit<React.ComponentProps<'div'>, 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart' | 'onAnimationEnd' | 'onTransitionEnd'>) {
   const { carouselRef, orientation } = useCarousel();
 
   return (
     <div ref={carouselRef} className="overflow-hidden" data-slot="carousel-content">
-      <div
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
         className={cn(
           'flex transition-transform duration-700 ease-out',
           orientation === 'horizontal' ? '-ml-3 sm:-ml-4' : '-mt-4 flex-col',
@@ -155,14 +178,15 @@ function CarouselContent({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function CarouselItem({ className, ...props }: React.ComponentProps<'div'>) {
+function CarouselItem({ className, ...props }: Omit<React.ComponentProps<'div'>, 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart' | 'onAnimationEnd' | 'onTransitionEnd'>) {
   const { orientation, mountAnimationClass } = useCarousel();
 
   return (
-    <div
+    <motion.div
       role="group"
       aria-roledescription="slide"
       data-slot="carousel-item"
+      variants={itemVariants}
       className={cn(
         'min-w-0 shrink-0 grow-0 basis-full transition-all duration-500 ease-out will-change-transform',
         orientation === 'horizontal'

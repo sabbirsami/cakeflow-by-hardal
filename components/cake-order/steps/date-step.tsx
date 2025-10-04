@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { addDays, format, parseISO, startOfToday } from 'date-fns';
 import { CalendarIcon, Clock } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { CakeOrder } from '../cake-order-funnel';
 
 interface DateStepProps {
@@ -73,10 +74,22 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
   return (
     <div className="space-y-6">
       <div className="space-y-1.5">
-        <h3 className="text-base font-semibold text-primary">When Would You Like Your Cake?</h3>
-        <p className="text-sm text-muted-foreground">
+        <motion.h3
+          className="text-base font-semibold text-primary"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+          When Would You Like Your Cake?
+        </motion.h3>
+        <motion.p
+          className="text-sm text-muted-foreground"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: 'easeOut', delay: 0.05 }}
+        >
           Choose a pickup date at least 24 hours in advance and a time during our opening hours.
-        </p>
+        </motion.p>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
@@ -120,7 +133,13 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
             <SelectContent position="popper" className="rounded-lg">
               {timeOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                  <motion.span
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                  >
+                    {option.label}
+                  </motion.span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -128,10 +147,15 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
+      <motion.div
+        className="rounded-2xl border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+      >
         <span className="font-medium text-foreground">Note:</span> Our patisserie is open Tuesday to
         Sunday, 9:00 AM – 6:00 PM. We are closed on Mondays.
-      </div>
+      </motion.div>
 
       <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button

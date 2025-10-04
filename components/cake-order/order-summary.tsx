@@ -1,4 +1,5 @@
 import { Cake, Calendar, ImageIcon, Layers, Mail, MessageSquare, Phone, User } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { CakeOrder } from './cake-order-funnel';
 
 type OrderSummaryProps = {
@@ -9,15 +10,32 @@ type OrderSummaryProps = {
 export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
   return (
     <div className="border-s- border-border bg-card p-8 shadow-sm">
-      <h3 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-foreground ">
+      <motion.h3
+        className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-foreground "
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+      >
         Your Cake
-      </h3>
-      <p className="text-sm text-muted-foreground mb-8">Your Order Summary</p>
+      </motion.h3>
+      <motion.p
+        className="text-sm text-muted-foreground mb-8"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut', delay: 0.05 }}
+      >
+        Your Order Summary
+      </motion.p>
 
       <div className="space-y-6">
         {/* Shape */}
         {order.shape && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <Cake className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -27,12 +45,17 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 <p className="text-base text-foreground font-medium capitalize">{order.shape}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Layers */}
         {order.layers && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <Layers className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -44,12 +67,17 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Tastes */}
         {order.tastes && order.tastes.length > 0 && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <Cake className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -59,12 +87,17 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 <p className="text-base text-foreground font-medium">{order.tastes.join(', ')}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Text */}
         {order.text && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <MessageSquare className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -74,12 +107,17 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 <p className="text-base text-foreground font-medium italic">&ldquo;{order.text}&rdquo;</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Image */}
         {order.imageUrl && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <ImageIcon className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -89,12 +127,17 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 <p className="text-base text-foreground font-medium">Image uploaded</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Contact Info */}
         {order.name && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <User className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -104,11 +147,16 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 <p className="text-base text-foreground font-medium">{order.name}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {order.email && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <Mail className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -118,11 +166,16 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 <p className="text-base text-foreground font-medium break-all">{order.email}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {order.phone && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <Phone className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -132,12 +185,17 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 <p className="text-base text-foreground font-medium">{order.phone}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Date & Time */}
         {order.date && (
-          <div className="border-b border-border pb-4">
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
             <div className="flex items-start gap-3">
               <Calendar className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -155,7 +213,7 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Empty State */}

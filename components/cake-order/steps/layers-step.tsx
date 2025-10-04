@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import type { CakeOrder } from '../cake-order-funnel';
 
 interface LayersStepProps {
@@ -46,7 +47,14 @@ export function LayersStep({
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-primary">How Many Layers?</h3>
+        <motion.h3
+          className="text-sm text-primary"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+          How Many Layers?
+        </motion.h3>
       </div>
 
       <div className="relative">

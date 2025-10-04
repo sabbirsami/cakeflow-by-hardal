@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { CakeOrder } from '../cake-order-funnel';
 
 interface TextStepProps {
@@ -33,7 +34,14 @@ export function TextStep({ order, onNext, onBack, isFirstStep, onTextChange }: T
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-primary">Add a Personal Message</h3>
+        <motion.h3
+          className="text-sm text-primary"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
+          Add a Personal Message
+        </motion.h3>
       </div>
 
       <div className=" space-y-4">
@@ -49,14 +57,26 @@ export function TextStep({ order, onNext, onBack, isFirstStep, onTextChange }: T
             maxLength={50}
             className="border-border bg-card text-foreground !py-5"
           />
-          <p className="text-sm text-end text-muted-foreground">{text.length}/50 characters</p>
+          <motion.p
+            className="text-sm text-end text-muted-foreground"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
+            {text.length}/50 characters
+          </motion.p>
         </div>
 
         <div className="rounded-lg border border-border bg-muted/30 p-4">
-          <p className="text-sm text-muted-foreground">
+          <motion.p
+            className="text-sm text-muted-foreground"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
             <strong className="text-foreground">Preview:</strong>{' '}
             {text || 'Your message will appear here'}
-          </p>
+          </motion.p>
         </div>
       </div>
 

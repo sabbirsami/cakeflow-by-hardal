@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/carousel';
 import { Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { CakeOrder } from '../cake-order-funnel';
 
 interface TasteStepProps {
@@ -54,7 +55,15 @@ export function TasteStep({ order, onNext, onBack, isFirstStep, onTastesChange }
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-primary"> Select Your Flavors</h3>
+        <motion.h3
+          className="text-sm text-primary"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+          {' '}
+          Select Your Flavors
+        </motion.h3>
       </div>
 
       <div className="relative">

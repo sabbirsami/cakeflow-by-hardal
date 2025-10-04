@@ -16,7 +16,7 @@ import { LayersStep } from './steps/layers-step';
 import { ShapeStep } from './steps/shape-step';
 import { TasteStep } from './steps/taste-step';
 import { TextStep } from './steps/text-step';
-import { gsap } from 'gsap';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export type CakeOrder = {
   shape?: string;
@@ -76,39 +76,9 @@ export function CakeOrderFunnel() {
     setPreviewMessage(order.text);
   }, [order.text]);
 
-  useEffect(() => {
-    if (!stepContentRef.current) return;
+  // Step content animation handled by Framer Motion via motion.div
 
-    gsap.fromTo(
-      stepContentRef.current,
-      { opacity: 0, y: 28 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        ease: 'power2.out',
-      },
-    );
-  }, [currentStep]);
-
-  useEffect(() => {
-    const targets = [desktopPreviewRef.current, mobilePreviewRef.current].filter(Boolean) as HTMLDivElement[];
-
-    if (!targets.length) {
-      return;
-    }
-
-    gsap.fromTo(
-      targets,
-      { opacity: 0.8, scale: 0.98 },
-      {
-        opacity: 1,
-        scale: 1,
-        duration: 0.5,
-        ease: 'power1.out',
-      },
-    );
-  }, [previewShape, previewLayers, previewTastes, previewMessage]);
+  // Preview animation handled by Framer Motion via motion.div
 
   const handleNext = (data: Partial<CakeOrder>) => {
     const updatedOrder = { ...order, ...data };
@@ -238,8 +208,12 @@ export function CakeOrderFunnel() {
             {/* Middle Column - Form Content */}
             <div className="w-full col-span-full lg:col-span-7 px-1 sm:px-3 lg:px-6">
               <div className="flex flex-col gap-8 lg:min-h-[540px]">
-                <div
+                <motion.div
                   ref={desktopPreviewRef}
+                  key={`${previewShape}-${previewLayers}-${previewMessage}-${(previewTastes ?? []).join(',')}-desktop`}
+                  initial={{ opacity: 0.8, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.7, ease: 'easeOut' }}
                   className="hidden lg:flex items-center justify-center border-b px-10 py-8 text-foreground/90"
                 >
                   {previewShape ? (
@@ -256,12 +230,29 @@ export function CakeOrderFunnel() {
                       Select a shape to preview your cake
                     </div>
                   )}
-                </div>
-                <div ref={stepContentRef} className="mt-8 lg:mt-auto">
-                  {stepContent}
-                </div>
+                </motion.div>
+                <AnimatePresence mode="popLayout">
+                  <motion.div
+                    ref={stepContentRef}
+                    key={`step-${currentStep}`}
+                    initial={{ opacity: 0, y: 28 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.7, ease: 'easeOut' }}
+                    className="mt-8 lg:mt-auto"
+                  >
+                    {stepContent}
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              <div className="mt-8 lg:hidden" ref={mobilePreviewRef}>
+              <motion.div
+                className="mt-8 lg:hidden"
+                ref={mobilePreviewRef}
+                key={`${previewShape}-${previewLayers}-${previewMessage}-${(previewTastes ?? []).join(',')}-mobile`}
+                initial={{ opacity: 0.8, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.7, ease: 'easeOut' }}
+              >
                 <div className="flex items-center justify-center rounded-3xl border border-border/60 bg-card/60 p-6 text-foreground/90">
                   {previewShape ? (
                     <ShapePreview
@@ -277,7 +268,7 @@ export function CakeOrderFunnel() {
                     </div>
                   )}
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Right Column - Order Summary (Sticky) */}

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { CakeOrder } from '../cake-order-funnel';
 
 interface ContactStepProps {
@@ -29,7 +30,14 @@ export function ContactStep({ order, onNext, onBack, isFirstStep }: ContactStepP
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-primary">Your Contact Information</h3>
+        <motion.h3
+          className="text-sm text-primary"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
+          Your Contact Information
+        </motion.h3>
       </div>
 
       <div className="space-y-6">

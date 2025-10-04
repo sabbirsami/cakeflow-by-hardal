@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { CakeOrder } from '../cake-order-funnel';
 import { CAKE_SHAPE_OPTIONS, CakeShapeId } from '../shape-data';
 
@@ -45,7 +46,14 @@ export function ShapeStep({ order, onNext, onBack, isFirstStep, onShapeChange }:
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-primary">Choose Your Cake Shape</h3>
+        <motion.h3
+          className="text-sm text-primary"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+          Choose Your Cake Shape
+        </motion.h3>
       </div>
 
       <div className="relative">

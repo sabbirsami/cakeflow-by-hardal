@@ -1,3 +1,5 @@
+import { motion, type Variants } from 'framer-motion';
+
 interface Step {
   id: number;
   title: string;
@@ -9,16 +11,40 @@ interface StepIndicatorProps {
   vertical?: boolean;
 }
 
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.18,
+      delayChildren: 0.1,
+    },
+  },
+} satisfies Variants;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: 'easeOut' },
+  },
+} satisfies Variants;
+
 export function StepIndicator({ steps, currentStep, vertical = false }: StepIndicatorProps) {
   if (vertical) {
     return (
-      <div className="flex flex-col gap-6">
-        {steps.map((step) => {
+      <motion.div
+        className="flex flex-col gap-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+        {steps.map((step, index) => {
           const isCompleted = step.id < currentStep;
           const isCurrent = step.id === currentStep;
 
           return (
-            <div key={step.id} className="flex items-center gap-3">
+            <motion.div key={step.id} className="flex items-center gap-3" variants={itemVariants} custom={index}>
               <div
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
                   isCompleted
@@ -30,12 +56,7 @@ export function StepIndicator({ steps, currentStep, vertical = false }: StepIndi
               >
                 {isCompleted ? (
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
                   <span className="text-sm font-semibold">{step.id}</span>
@@ -48,34 +69,41 @@ export function StepIndicator({ steps, currentStep, vertical = false }: StepIndi
               >
                 {step.title}
               </span>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     );
   }
 
-  // Horizontal layout for mobile
+  const progressWidth =
+    steps.length > 1 ? ((currentStep - 1) / (steps.length - 1)) * 100 : currentStep > 1 ? 100 : 0;
+
   return (
     <div className="relative">
-      {/* Progress Bar */}
       <div className="absolute left-0 top-5 h-0.5 w-full bg-border">
-        <div
-          className="h-full bg-accent transition-all duration-500"
-          style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
+        <motion.div
+          className="h-full bg-accent"
+          initial={{ width: 0 }}
+          animate={{ width: `${progressWidth}%` }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
         />
       </div>
 
-      {/* Steps */}
-      <div className="relative flex justify-between">
-        {steps.map((step) => {
+      <motion.div
+        className="relative flex justify-between"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+        {steps.map((step, index) => {
           const isCompleted = step.id < currentStep;
           const isCurrent = step.id === currentStep;
 
           return (
-            <div key={step.id} className="flex flex-col items-center">
+            <motion.div key={step.id} className="flex flex-col items-center" variants={itemVariants} custom={index}>
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
                   isCompleted
                     ? 'border-accent bg-accent text-accent-foreground'
                     : isCurrent
@@ -85,12 +113,7 @@ export function StepIndicator({ steps, currentStep, vertical = false }: StepIndi
               >
                 {isCompleted ? (
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
                   <span className="text-sm font-semibold">{step.id}</span>
@@ -103,10 +126,10 @@ export function StepIndicator({ steps, currentStep, vertical = false }: StepIndi
               >
                 {step.title}
               </span>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { CakeOrder } from '../cake-order-funnel';
 
 interface ImageStepProps {
@@ -49,7 +50,14 @@ export function ImageStep({ order, onNext, onBack, isFirstStep }: ImageStepProps
   return (
     <div className="space-y-3">
       <div className="pb-3">
-        <h3 className="text-sm text-primary">Upload Reference Image</h3>
+        <motion.h3
+          className="text-sm text-primary"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+          Upload Reference Image
+        </motion.h3>
       </div>
 
       <div className="space-y-4">
@@ -102,8 +110,22 @@ export function ImageStep({ order, onNext, onBack, isFirstStep }: ImageStepProps
                 </div>
                 <div>
                   <label htmlFor="file-upload" className="cursor-pointer">
-                    <span className="text-accent hover:underline">Click to upload</span>
-                    <span className="text-muted-foreground"> or drag and drop</span>
+                    <motion.span
+                      className="text-accent hover:underline"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                    >
+                      Click to upload
+                    </motion.span>
+                    <motion.span
+                      className="text-muted-foreground"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeOut', delay: 0.05 }}
+                    >
+                      {' '}or drag and drop
+                    </motion.span>
                   </label>
                   <input
                     id="file-upload"
@@ -113,7 +135,14 @@ export function ImageStep({ order, onNext, onBack, isFirstStep }: ImageStepProps
                     onChange={handleFileChange}
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
+                <motion.p
+                  className="text-sm text-muted-foreground"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                >
+                  PNG, JPG, GIF up to 10MB
+                </motion.p>
               </div>
             )}
           </div>
