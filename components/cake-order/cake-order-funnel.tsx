@@ -43,11 +43,10 @@ export function CakeOrderFunnel() {
   const [order, setOrder] = useState<CakeOrder>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [previewShape, setPreviewShape] = useState<CakeShapeId | undefined>(
-    order.shape as CakeShapeId | undefined
+    order.shape as CakeShapeId | undefined,
   );
-  const [previewLayers, setPreviewLayers] = useState<number | undefined>(
-    order.layers
-  );
+  const [previewLayers, setPreviewLayers] = useState<number | undefined>(order.layers);
+  const [previewTastes, setPreviewTastes] = useState<string[] | undefined>(order.tastes);
 
   useEffect(() => {
     setPreviewShape(order.shape as CakeShapeId | undefined);
@@ -63,6 +62,10 @@ export function CakeOrderFunnel() {
     }
   }, [order.layers]);
 
+  useEffect(() => {
+    setPreviewTastes(order.tastes);
+  }, [order.tastes]);
+
   const handleNext = (data: Partial<CakeOrder>) => {
     const updatedOrder = { ...order, ...data };
     setOrder(updatedOrder);
@@ -73,6 +76,10 @@ export function CakeOrderFunnel() {
 
     if (data.layers) {
       setPreviewLayers(data.layers);
+    }
+
+    if (data.tastes) {
+      setPreviewTastes(data.tastes);
     }
 
     if (currentStep === STEPS.length) {
@@ -102,6 +109,7 @@ export function CakeOrderFunnel() {
   const CurrentStepComponent = STEPS[currentStep - 1].component;
   const isShapeStep = currentStep === 1;
   const isLayersStep = currentStep === 2;
+  const isTasteStep = currentStep === 3;
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,6 +163,7 @@ export function CakeOrderFunnel() {
                     <ShapePreview
                       shape={previewShape}
                       layers={previewLayers ?? order.layers ?? 1}
+                      tastes={previewTastes ?? order.tastes ?? []}
                       className="w-full max-w-[200px]"
                     />
                   ) : (
@@ -180,6 +189,14 @@ export function CakeOrderFunnel() {
                       isFirstStep={false}
                       onLayersChange={(n: number) => setPreviewLayers(n)}
                     />
+                  ) : isTasteStep ? (
+                    <TasteStep
+                      order={order}
+                      onNext={handleNext}
+                      onBack={handleBack}
+                      isFirstStep={false}
+                      onTastesChange={(t: string[]) => setPreviewTastes(t)}
+                    />
                   ) : (
                     <CurrentStepComponent
                       order={order}
@@ -196,6 +213,7 @@ export function CakeOrderFunnel() {
                     <ShapePreview
                       shape={previewShape}
                       layers={previewLayers ?? order.layers ?? 1}
+                      tastes={previewTastes ?? order.tastes ?? []}
                       className="w-full max-w-[160px]"
                     />
                   ) : (

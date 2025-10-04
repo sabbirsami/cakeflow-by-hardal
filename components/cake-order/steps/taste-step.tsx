@@ -10,7 +10,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Check } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CakeOrder } from '../cake-order-funnel';
 
 interface TasteStepProps {
@@ -18,6 +18,7 @@ interface TasteStepProps {
   onNext: (data: Partial<CakeOrder>) => void;
   onBack: () => void;
   isFirstStep: boolean;
+  onTastesChange?: (tastes: string[]) => void;
 }
 
 const TASTES = [
@@ -31,7 +32,7 @@ const TASTES = [
   { id: 'coffee', name: 'Coffee', description: 'Bold and aromatic' },
 ];
 
-export function TasteStep({ order, onNext, onBack, isFirstStep }: TasteStepProps) {
+export function TasteStep({ order, onNext, onBack, isFirstStep, onTastesChange }: TasteStepProps) {
   const [selectedTastes, setSelectedTastes] = useState<string[]>(order.tastes || []);
 
   const toggleTaste = (tasteId: string) => {
@@ -39,6 +40,10 @@ export function TasteStep({ order, onNext, onBack, isFirstStep }: TasteStepProps
       prev.includes(tasteId) ? prev.filter((id) => id !== tasteId) : [...prev, tasteId],
     );
   };
+
+  useEffect(() => {
+    onTastesChange?.(selectedTastes);
+  }, [selectedTastes, onTastesChange]);
 
   const handleNext = () => {
     if (selectedTastes.length > 0) {
@@ -88,7 +93,9 @@ export function TasteStep({ order, onNext, onBack, isFirstStep }: TasteStepProps
                     <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
                       <div
                         className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
-                          isSelected ? 'border-accent bg-accent text-accent-foreground' : 'border-border text-muted-foreground'
+                          isSelected
+                            ? 'border-accent bg-accent text-accent-foreground'
+                            : 'border-border text-muted-foreground'
                         }`}
                       >
                         {isSelected && <Check className="h-5 w-5" strokeWidth={3} />}
