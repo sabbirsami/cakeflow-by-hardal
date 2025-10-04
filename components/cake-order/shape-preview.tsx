@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { CakeShapeId } from './shape-data';
 
 export type ShapePreviewProps = {
@@ -29,7 +29,18 @@ function layerSideFill(i: number, layers: number) {
   return `hsl(${baseHue} ${sat}% ${l}%)`;
 }
 
-const depth = 14; // px vertical offset between layers (visual height)
+const depth = 28; // px vertical offset between layers (visual height)
+const BASE_SCALE = 1.4;
+const TAPER_SPREAD = 0.35;
+const TOP_INNER_SHRINK = 0.06;
+
+function adjustLightness(hsl: string, delta: number) {
+  const match = /hsl\(([^\s]+)\s+([^%]+)%\s+([^%]+)%\)/.exec(hsl);
+  if (!match) return hsl;
+  const [, h, s, l] = match;
+  const nextL = Math.max(0, Math.min(100, parseFloat(l) + delta));
+  return `hsl(${h} ${s}% ${nextL}%)`;
+}
 
 type ShapeDef = {
   tag: 'ellipse' | 'rect' | 'polygon' | 'path';
@@ -75,9 +86,27 @@ function shapeDef(shape: CakeShapeId): ShapeDef {
   }
 }
 
-function renderShape(shape: CakeShapeId, extra: React.SVGProps<SVGElement> = {}) {
+function renderShape(
+  shape: CakeShapeId,
+  extra: React.SVGProps<SVGElement> = {},
+  scaleMultiplier = 1
+) {
   const def = shapeDef(shape);
-  return React.createElement(def.tag, { ...def.attrs, ...extra });
+  const { transform, ...rest } = extra;
+  const baseScale = (BASE_SCALE * scaleMultiplier).toFixed(4);
+  const transformParts = [
+    'translate(100 100)',
+    `scale(${baseScale})`,
+    'translate(-100 -100)',
+  ];
+  if (transform) {
+    transformParts.push(transform.toString());
+  }
+  return React.createElement(def.tag, {
+    ...def.attrs,
+    ...rest,
+    transform: transformParts.join(' '),
+  });
 }
 
 const TASTE_COLORS: Record<string, string> = {
@@ -94,10 +123,38 @@ const TASTE_COLORS: Record<string, string> = {
 export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePreviewProps) {
   if (!shape) return null;
   const L = Math.max(1, Math.min(layers, 8)); // clamp for visuals
+  const gradientPrefix = useId();
 
   const sideStroke = 'rgba(0,0,0,0.08)';
   const topStroke = 'rgba(0,0,0,0.12)';
   const highlightStroke = 'rgba(255,255,255,0.85)';
+
+  const layerConfigs = Array.from({ length: L }).map((_, idx) => {
+    const i = L - 1 - idx; // bottom first
+    const y = i * depth;
+    const denom = Math.max(L - 1, 1);
+    const taperRatio = L > 1 ? i / denom : 0.5;
+    const scale = 1 - TAPER_SPREAD / 2 + taperRatio * TAPER_SPREAD;
+    const topScale = scale * (1 - TOP_INNER_SHRINK);
+    // Taste coloring: assign from top to bottom using selected tastes
+    const tasteCount = tastes?.length ?? 0;
+    const tasteIdx = tasteCount > 0 ? (L - 1 - idx) % tasteCount : -1; // top uses tastes[0]
+    const tasteColor = tasteIdx >= 0 ? TASTE_COLORS[tastes![tasteIdx]] : undefined;
+    const topFill = tasteColor ?? layerFill(i, L);
+    const sideBase = tasteColor ?? layerSideFill(i, L);
+    const sideGradientId = `${gradientPrefix}-side-${i}`;
+    const topGradientId = `${gradientPrefix}-top-${i}`;
+    return {
+      i,
+      y,
+      scale,
+      topScale,
+      topFill,
+      sideBase,
+      sideGradientId,
+      topGradientId,
+    };
+  });
 
   return (
     <svg
@@ -110,36 +167,70 @@ export function ShapePreview({ shape, layers = 1, tastes, className }: ShapePrev
         <filter id="ds" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="6" stdDeviation="6" floodOpacity="0.18" />
         </filter>
+        <radialGradient id="plate" cx="50%" cy="50%" r="70%">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.18)" />
+          <stop offset="100%" stopColor="rgba(0,0,0,0.2)" stopOpacity="0.25" />
+        </radialGradient>
+        {layerConfigs.map(({ sideBase, sideGradientId, topFill, topGradientId }) => (
+          <React.Fragment key={sideGradientId}>
+            <linearGradient id={sideGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor={adjustLightness(sideBase, 12)} />
+              <stop offset="55%" stopColor={sideBase} />
+              <stop offset="100%" stopColor={adjustLightness(sideBase, -12)} />
+            </linearGradient>
+            <radialGradient id={topGradientId} cx="50%" cy="32%" r="70%">
+              <stop offset="0%" stopColor={adjustLightness(topFill, 16)} />
+              <stop offset="65%" stopColor={topFill} />
+              <stop offset="100%" stopColor={adjustLightness(topFill, -8)} />
+            </radialGradient>
+          </React.Fragment>
+        ))}
       </defs>
 
       {/* Ground shadow */}
-      <ellipse cx={100} cy={150 + (L - 1) * (depth / 2)} rx={64} ry={10} fill="rgba(0,0,0,0.12)" />
+      <ellipse cx={100} cy={165 + (L - 1) * (depth / 2)} rx={115} ry={20} fill="rgba(0,0,0,0.18)" />
+      <ellipse cx={100} cy={160 + (L - 1) * (depth / 2)} rx={105} ry={16} fill="url(#plate)" opacity={0.55} />
 
       {/* Layers: bottom to top */}
-      {Array.from({ length: L }).map((_, idx) => {
-        const i = L - 1 - idx; // bottom first
-        const y = i * depth;
-        // Taste coloring: assign from top to bottom using selected tastes
-        const tasteCount = tastes?.length ?? 0;
-        const tasteIdx = tasteCount > 0 ? (L - 1 - idx) % tasteCount : -1; // top uses tastes[0]
-        const tasteColor = tasteIdx >= 0 ? TASTE_COLORS[tastes![tasteIdx]] : undefined;
-        const topFill = tasteColor ?? layerFill(i, L);
-        const sideFill = tasteColor ?? layerSideFill(i, L);
-        return (
-          <g key={i}>
-            {/* Side face (offset down) */}
-            <g transform={`translate(0, ${y + depth / 2})`}>
-              {renderShape(shape, { fill: sideFill, stroke: sideStroke, strokeWidth: 1 })}
-            </g>
-
-            {/* Top face (with shadow on the lowest layer) */}
-            <g transform={`translate(0, ${y})`} filter={i === 0 ? 'url(#ds)' : undefined}>
-              {renderShape(shape, { fill: topFill, stroke: topStroke, strokeWidth: 1 })}
-              {renderShape(shape, { fill: 'none', stroke: highlightStroke, strokeWidth: 1.25 })}
-            </g>
+      {layerConfigs.map(({ i, y, scale, topScale, sideGradientId, topGradientId }) => (
+        <g key={i}>
+          {/* Side face (offset down) */}
+          <g transform={`translate(0, ${y + depth / 2})`}>
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${sideGradientId})`,
+                stroke: sideStroke,
+                strokeWidth: 1.2,
+              },
+              scale
+            )}
           </g>
-        );
-      })}
+
+          {/* Top face (with shadow on the lowest layer) */}
+          <g transform={`translate(0, ${y})`} filter={i === 0 ? 'url(#ds)' : undefined}>
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${topGradientId})`,
+                stroke: topStroke,
+                strokeWidth: 1.15,
+              },
+              topScale
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: 'none',
+                stroke: highlightStroke,
+                strokeWidth: 1.35,
+                opacity: 0.7,
+              },
+              topScale
+            )}
+          </g>
+        </g>
+      ))}
     </svg>
   );
 }

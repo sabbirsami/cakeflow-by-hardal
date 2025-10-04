@@ -158,13 +158,13 @@ export function CakeOrderFunnel() {
             {/* Middle Column - Form Content */}
             <div className="w-full col-span-full lg:col-span-7 px-0 lg:px-10">
               <div className="flex flex-col gap-8">
-                <div className="hidden lg:flex items-center justify-center rounded-xl border border-border bg-card p-6 text-foreground/90">
+                <div className="hidden lg:flex items-center justify-center text-foreground/90">
                   {previewShape ? (
                     <ShapePreview
                       shape={previewShape}
                       layers={previewLayers ?? order.layers ?? 1}
                       tastes={previewTastes ?? order.tastes ?? []}
-                      className="w-full max-w-[200px]"
+                      className="w-full max-w-[300px]"
                     />
                   ) : (
                     <div className="text-center text-muted-foreground">
@@ -208,7 +208,7 @@ export function CakeOrderFunnel() {
                 </div>
               </div>
               <div className="mt-6 lg:hidden">
-                <div className="flex items-center justify-center rounded-xl border border-border bg-card p-5 text-foreground/90">
+                <div className="flex items-center justify-center  p-5 text-foreground/90">
                   {previewShape ? (
                     <ShapePreview
                       shape={previewShape}
