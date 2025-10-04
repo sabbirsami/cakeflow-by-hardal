@@ -46,7 +46,7 @@ export function ConfirmationStep({ order }: ConfirmationStepProps) {
               Order Confirmed!
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Thank you for your order. We've received your custom cake request.
+              Thank you for your order. We&rsquo;ve received your custom cake request.
             </p>
           </div>
 

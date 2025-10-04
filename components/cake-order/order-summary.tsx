@@ -71,7 +71,7 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                   Cake Text
                 </p>
-                <p className="text-base text-foreground font-medium italic">"{order.text}"</p>
+                <p className="text-base text-foreground font-medium italic">&ldquo;{order.text}&rdquo;</p>
               </div>
             </div>
           </div>

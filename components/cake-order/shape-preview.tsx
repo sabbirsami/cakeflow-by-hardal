@@ -40,7 +40,6 @@ const MESSAGE_MAX_LINES = 3;
 const MESSAGE_CENTER_Y = 82;
 const MESSAGE_LINE_HEIGHT = 10;
 const TOP_GLOSS_SHRINK = 0.92;
-const TOP_INNER_SHADE_SHRINK = 0.96;
 const SIDE_RIM_SHRINK = 0.995;
 
 function adjustLightness(hsl: string, delta: number) {
@@ -98,39 +97,44 @@ type ShapeDef = {
 function shapeDef(shape: CakeShapeId): ShapeDef {
   switch (shape) {
     case 'round':
-      return { tag: 'ellipse', attrs: { cx: 100, cy: 70, rx: 60, ry: 38 } } as any;
+      return {
+        tag: 'ellipse',
+        attrs: { cx: 100, cy: 70, rx: 60, ry: 38 } as React.SVGProps<SVGEllipseElement>,
+      };
     case 'square':
       return {
         tag: 'rect',
-        attrs: { x: 40, y: 35, width: 120, height: 70, rx: 6, ry: 6 },
-      } as any;
+        attrs: { x: 40, y: 35, width: 120, height: 70, rx: 6, ry: 6 } as React.SVGProps<SVGRectElement>,
+      };
     case 'rectangle':
       return {
         tag: 'rect',
-        attrs: { x: 30, y: 50, width: 140, height: 50, rx: 4, ry: 4 },
-      } as any;
+        attrs: { x: 30, y: 50, width: 140, height: 50, rx: 4, ry: 4 } as React.SVGProps<SVGRectElement>,
+      };
     case 'hexagon':
       return {
         tag: 'polygon',
-        attrs: { points: '100,30 145,55 145,95 100,120 55,95 55,55' },
-      } as any;
+        attrs: { points: '100,30 145,55 145,95 100,120 55,95 55,55' } as React.SVGProps<SVGPolygonElement>,
+      };
     case 'star':
       return {
         tag: 'polygon',
-        attrs: { points: '100,30 118,62 154,66 128,90 135,126 100,108 65,126 72,90 46,66 82,62' },
-      } as any;
+        attrs: {
+          points: '100,30 118,62 154,66 128,90 135,126 100,108 65,126 72,90 46,66 82,62',
+        } as React.SVGProps<SVGPolygonElement>,
+      };
     case 'heart':
       return {
         tag: 'path',
         attrs: {
           d: 'M100 52 C 112 36, 136 36, 148 52 C 162 70, 152 94, 100 120 C 48 94, 38 70, 52 52 C 64 36, 88 36, 100 52 Z',
-        },
-      } as any;
+        } as React.SVGProps<SVGPathElement>,
+      };
     default:
       return {
         tag: 'rect',
-        attrs: { x: 40, y: 35, width: 120, height: 70, rx: 12, ry: 12 },
-      } as any;
+        attrs: { x: 40, y: 35, width: 120, height: 70, rx: 12, ry: 12 } as React.SVGProps<SVGRectElement>,
+      };
   }
 }
 
@@ -169,11 +173,10 @@ const TASTE_COLORS: Record<string, string> = {
 };
 
 export function ShapePreview({ shape, layers = 1, tastes, message, className }: ShapePreviewProps) {
+  const gradientPrefix = useId();
   if (!shape) return null;
   const L = Math.max(1, Math.min(layers, 8)); // clamp for visuals
-  const gradientPrefix = useId();
 
-  const sideStroke = 'rgba(0,0,0,0.08)';
   const topStroke = 'rgba(0,0,0,0.12)';
   const highlightStroke = 'rgba(255,255,255,0.85)';
   const messageLines = message ? wrapMessage(message) : [];
@@ -371,6 +374,9 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
           topInnerShadeId,
           topRimHighlightId,
           topSpotHighlightId,
+          frontHighlightId,
+          frontShadowId,
+          frontClipId,
         }) => (
         <g key={i}>
           {/* Side face (offset down) */}
@@ -404,6 +410,15 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
               {
                 fill: `url(#${interLayerShadeId})`,
                 opacity: 0.4,
+              },
+              scale,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${frontShadowId})`,
+                opacity: 0.32,
+                clipPath: `url(#${frontClipId})`,
               },
               scale,
             )}
@@ -471,6 +486,15 @@ export function ShapePreview({ shape, layers = 1, tastes, message, className }: 
                 opacity: 0.8,
               },
               topScale * 0.75,
+            )}
+            {renderShape(
+              shape,
+              {
+                fill: `url(#${frontHighlightId})`,
+                opacity: 0.5,
+                clipPath: `url(#${frontClipId})`,
+              },
+              topScale,
             )}
             {i === 0 && messageLines.length > 0 && (
               <g

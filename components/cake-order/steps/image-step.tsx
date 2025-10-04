@@ -4,6 +4,7 @@ import type React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import Image from 'next/image';
 import { useState } from 'react';
 import { CakeOrder } from '../cake-order-funnel';
 
@@ -67,7 +68,9 @@ export function ImageStep({ order, onNext, onBack, isFirstStep }: ImageStepProps
           >
             {imageUrl ? (
               <div className="space-y-4">
-                <img
+                <Image
+                  width={200}
+                  height={200}
                   src={imageUrl || '/placeholder.svg'}
                   alt="Cake reference"
                   className="mx-auto max-h-64 rounded-lg object-contain"
