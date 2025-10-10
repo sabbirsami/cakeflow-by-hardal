@@ -38,6 +38,7 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
   const initialDate = order.date ? parseISO(order.date) : undefined;
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(initialDate);
   const [selectedTime, setSelectedTime] = useState(order.time || '');
+  const [specialWishes, setSpecialWishes] = useState(order.specialWishes || '');
 
   const isValid = Boolean(selectedDate && selectedTime);
 
@@ -49,6 +50,7 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
     onNext({
       date: format(selectedDate, 'yyyy-MM-dd'),
       time: selectedTime,
+      specialWishes: specialWishes.trim() ? specialWishes.trim() : undefined,
     });
   };
 
@@ -145,6 +147,19 @@ export function DateStep({ order, onNext, onBack, isFirstStep }: DateStepProps) 
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-foreground" htmlFor="special-wishes">
+          Special Wishes (optional)
+        </Label>
+        <textarea
+          id="special-wishes"
+          value={specialWishes}
+          onChange={(event) => setSpecialWishes(event.target.value)}
+          placeholder="Let us know about decorations, allergies, or any extra details."
+          className="min-h-[120px] w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground shadow-sm focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20"
+        />
       </div>
 
       <motion.div

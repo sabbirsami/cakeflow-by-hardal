@@ -14,11 +14,15 @@ import { DateStep } from './steps/date-step';
 import { ImageStep } from './steps/image-step';
 import { LayersStep } from './steps/layers-step';
 import { ShapeStep } from './steps/shape-step';
+import { SizeStep } from './steps/size-step';
 import { TasteStep } from './steps/taste-step';
 import { TextStep } from './steps/text-step';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export type CakeOrder = {
+  sizeOption?: '18cm' | '24cm' | '28cm' | 'other';
+  sizeCustom?: string;
+  size?: string;
   shape?: string;
   layers?: number;
   tastes?: string[];
@@ -29,16 +33,18 @@ export type CakeOrder = {
   phone?: string;
   date?: string;
   time?: string;
+  specialWishes?: string;
 };
 
 const STEPS = [
-  { id: 1, title: 'Shape', component: ShapeStep },
-  { id: 2, title: 'Layers', component: LayersStep },
-  { id: 3, title: 'Taste', component: TasteStep },
-  { id: 4, title: 'Text', component: TextStep },
-  { id: 5, title: 'Image', component: ImageStep },
-  { id: 6, title: 'Contact', component: ContactStep },
-  { id: 7, title: 'Date', component: DateStep },
+  { id: 1, title: 'Size', component: SizeStep },
+  { id: 2, title: 'Shape', component: ShapeStep },
+  { id: 3, title: 'Layers', component: LayersStep },
+  { id: 4, title: 'Taste', component: TasteStep },
+  { id: 5, title: 'Text', component: TextStep },
+  { id: 6, title: 'Image', component: ImageStep },
+  { id: 7, title: 'Contact', component: ContactStep },
+  { id: 8, title: 'Date', component: DateStep },
 ];
 export function CakeOrderFunnel() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -125,12 +131,15 @@ export function CakeOrderFunnel() {
   }
 
   const CurrentStepComponent = STEPS[currentStep - 1].component;
-  const isShapeStep = currentStep === 1;
-  const isLayersStep = currentStep === 2;
-  const isTasteStep = currentStep === 3;
-  const isTextStep = currentStep === 4;
+  const isShapeStep = CurrentStepComponent === ShapeStep;
+  const isLayersStep = CurrentStepComponent === LayersStep;
+  const isTasteStep = CurrentStepComponent === TasteStep;
+  const isTextStep = CurrentStepComponent === TextStep;
+  const isSizeStep = CurrentStepComponent === SizeStep;
 
-  const stepContent = isShapeStep ? (
+  const stepContent = isSizeStep ? (
+    <SizeStep order={order} onNext={handleNext} onBack={handleBack} isFirstStep={currentStep === 1} />
+  ) : isShapeStep ? (
     <ShapeStep
       order={order}
       onNext={handleNext}

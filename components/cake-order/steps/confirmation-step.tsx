@@ -2,26 +2,40 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Download } from 'lucide-react';
 import { CakeOrder } from '../cake-order-funnel';
+import { generateHardalOrderPdf } from '../pdf/generate-order-pdf';
 
 interface ConfirmationStepProps {
   order: CakeOrder;
 }
 
 export function ConfirmationStep({ order }: ConfirmationStepProps) {
+  const handleDownloadPdf = () => {
+    generateHardalOrderPdf(order);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-foreground">
-            Hardal Patisserie
-          </h1>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-foreground">
+              Hardal Patisserie
+            </h1>
+            <Button
+              variant="outline"
+              onClick={handleDownloadPdf}
+              className="border-border text-foreground hover:bg-accent/10"
+            >
+              <Download className="mr-2 h-4 w-4" /> Download PDF
+            </Button>
+          </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto max-w-2xl space-y-8">
-          {/* Success Icon */}
+      <main className="container mx-auto px-4 py-12">
+        <div className="mx-auto max-w-3xl space-y-10">
           <div className="flex justify-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-accent/10">
               <svg
@@ -30,83 +44,88 @@ export function ConfirmationStep({ order }: ConfirmationStepProps) {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
           </div>
 
-          {/* Title */}
-          <div className="text-center">
+          <div className="space-y-3 text-center">
             <h2 className="font-[family-name:var(--font-playfair)] text-4xl font-bold text-foreground">
               Order Confirmed!
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Thank you for your order. We&rsquo;ve received your custom cake request.
+            <p className="text-lg text-muted-foreground">
+              Thank you for your order. We&rsquo;ve received your custom cake request and will be in touch soon.
             </p>
           </div>
 
-          {/* Order Summary */}
           <Card className="border-border bg-card p-6">
             <h3 className="mb-4 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-foreground">
               Order Summary
             </h3>
-            <div className="space-y-3 text-foreground">
-              <div className="flex justify-between border-b border-border pb-2">
-                <span className="text-muted-foreground">Shape:</span>
-                <span className="font-medium capitalize">{order.shape}</span>
+            <dl className="space-y-3 text-sm text-foreground">
+              <div className="flex items-start justify-between gap-6 border-b border-border pb-2">
+                <dt className="text-muted-foreground">Size</dt>
+                <dd className="font-medium capitalize">{order.size ?? '—'}</dd>
               </div>
-              <div className="flex justify-between border-b border-border pb-2">
-                <span className="text-muted-foreground">Layers:</span>
-                <span className="font-medium">{order.layers}</span>
+              <div className="flex items-start justify-between gap-6 border-b border-border pb-2">
+                <dt className="text-muted-foreground">Shape</dt>
+                <dd className="font-medium capitalize">{order.shape ?? '—'}</dd>
               </div>
-              <div className="flex justify-between border-b border-border pb-2">
-                <span className="text-muted-foreground">Flavors:</span>
-                <span className="font-medium capitalize">{order.tastes?.join(', ')}</span>
+              <div className="flex items-start justify-between gap-6 border-b border-border pb-2">
+                <dt className="text-muted-foreground">Layers</dt>
+                <dd className="font-medium">{order.layers ?? '—'}</dd>
+              </div>
+              <div className="flex items-start justify-between gap-6 border-b border-border pb-2">
+                <dt className="text-muted-foreground">Flavors</dt>
+                <dd className="font-medium capitalize">
+                  {order.tastes && order.tastes.length > 0 ? order.tastes.join(', ') : '—'}
+                </dd>
               </div>
               {order.text && (
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Message:</span>
-                  <span className="font-medium">{order.text}</span>
+                <div className="flex items-start justify-between gap-6 border-b border-border pb-2">
+                  <dt className="text-muted-foreground">Message</dt>
+                  <dd className="font-medium text-right">{order.text}</dd>
                 </div>
               )}
-              <div className="flex justify-between border-b border-border pb-2">
-                <span className="text-muted-foreground">Pickup Date:</span>
-                <span className="font-medium">{order.date}</span>
+              {order.specialWishes && (
+                <div className="flex items-start justify-between gap-6 border-b border-border pb-2">
+                  <dt className="text-muted-foreground">Special Wishes</dt>
+                  <dd className="whitespace-pre-line text-right text-sm font-medium">
+                    {order.specialWishes}
+                  </dd>
+                </div>
+              )}
+              <div className="flex items-start justify-between gap-6">
+                <dt className="text-muted-foreground">Pickup Date</dt>
+                <dd className="font-medium">{order.date ?? '—'}</dd>
               </div>
-              <div className="flex justify-between border-b border-border pb-2">
-                <span className="text-muted-foreground">Pickup Time:</span>
-                <span className="font-medium">{order.time}</span>
+              <div className="flex items-start justify-between gap-6">
+                <dt className="text-muted-foreground">Pickup Time</dt>
+                <dd className="font-medium">{order.time ?? '—'}</dd>
               </div>
-            </div>
+            </dl>
           </Card>
 
-          {/* Contact Info */}
           <Card className="border-border bg-card p-6">
             <h3 className="mb-4 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-foreground">
               Contact Information
             </h3>
-            <div className="space-y-2 text-foreground">
-              <p>
-                <span className="text-muted-foreground">Name:</span>{' '}
-                <span className="font-medium">{order.name}</span>
-              </p>
-              <p>
-                <span className="text-muted-foreground">Email:</span>{' '}
-                <span className="font-medium">{order.email}</span>
-              </p>
-              <p>
-                <span className="text-muted-foreground">Phone:</span>{' '}
-                <span className="font-medium">{order.phone}</span>
-              </p>
-            </div>
+            <dl className="space-y-3 text-sm text-foreground">
+              <div className="flex items-start justify-between gap-6">
+                <dt className="text-muted-foreground">Name</dt>
+                <dd className="font-medium">{order.name ?? '—'}</dd>
+              </div>
+              <div className="flex items-start justify-between gap-6">
+                <dt className="text-muted-foreground">Email</dt>
+                <dd className="font-medium">{order.email ?? '—'}</dd>
+              </div>
+              <div className="flex items-start justify-between gap-6">
+                <dt className="text-muted-foreground">Phone</dt>
+                <dd className="font-medium">{order.phone ?? '—'}</dd>
+              </div>
+            </dl>
           </Card>
 
-          {/* Next Steps */}
           <Card className="border-accent/50 bg-accent/5 p-6">
             <h3 className="mb-3 font-semibold text-foreground">What happens next?</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -127,8 +146,14 @@ export function ConfirmationStep({ order }: ConfirmationStepProps) {
             </ul>
           </Card>
 
-          {/* Action Button */}
-          <div className="flex justify-center pt-4">
+          <div className="flex flex-col items-center justify-center gap-3 pt-2 sm:flex-row">
+            <Button
+              onClick={handleDownloadPdf}
+              variant="outline"
+              className="border-border text-foreground hover:bg-accent/10"
+            >
+              <Download className="mr-2 h-4 w-4" /> Download PDF
+            </Button>
             <Button
               onClick={() => window.location.reload()}
               className="bg-accent text-accent-foreground hover:bg-accent/90"
@@ -137,7 +162,7 @@ export function ConfirmationStep({ order }: ConfirmationStepProps) {
             </Button>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

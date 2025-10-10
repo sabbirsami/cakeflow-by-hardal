@@ -1,4 +1,15 @@
-import { Cake, Calendar, ImageIcon, Layers, Mail, MessageSquare, Phone, User } from 'lucide-react';
+import {
+  Cake,
+  Calendar,
+  ImageIcon,
+  Layers,
+  Mail,
+  MessageSquare,
+  Phone,
+  Ruler,
+  Sparkles,
+  User,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { CakeOrder } from './cake-order-funnel';
 
@@ -28,6 +39,26 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
       </motion.p>
 
       <div className="space-y-6">
+        {/* Size */}
+        {order.size && (
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
+            <div className="flex items-start gap-3">
+              <Ruler className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                  Size
+                </p>
+                <p className="text-base text-foreground font-medium">{order.size}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Shape */}
         {order.shape && (
           <motion.div
@@ -105,6 +136,28 @@ export function OrderSummary({ order, currentStep }: OrderSummaryProps) {
                   Cake Text
                 </p>
                 <p className="text-base text-foreground font-medium italic">&ldquo;{order.text}&rdquo;</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Special Wishes */}
+        {order.specialWishes && (
+          <motion.div
+            className="border-b border-border pb-4"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
+            <div className="flex items-start gap-3">
+              <Sparkles className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                  Special Wishes
+                </p>
+                <p className="text-base text-foreground font-medium whitespace-pre-line">
+                  {order.specialWishes}
+                </p>
               </div>
             </div>
           </motion.div>
